@@ -23,11 +23,10 @@ sub handle_request {
     my $cgi  = shift;
     my $path = $cgi->path_info();
     my @loaded_html_modules = map /html\/(\w+)\.pm/, sort keys %INC;
-    my ($uri) = grep { $path =~ /^\/$_\/?$/i } @loaded_html_modules;
+    my ($uri) = grep { $path =~ /^\/$_\/?$/ } @loaded_html_modules;
     
     my $handler;
     if( defined $uri ) {
-        $uri = lc $uri;
         {
             no strict 'refs';
             $dispatch{$uri} = \&{"API::html::${uri}::print"};
