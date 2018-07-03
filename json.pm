@@ -27,9 +27,8 @@ sub print {
     
     ### Check if module for requested method is loaded, execute the method and fill the data{}-object
     if( defined $cgi->param('method') ) {
-        my ($method) = grep { $cgi->param('method') =~ /^($_|$_\/?\w*)$/i }  map /methods\/(\w+)\.pm/, keys %INC;
+        my ($method) = grep { $cgi->param('method') =~ /^($_|$_\/?\w*)$/ }  map /methods\/(\w+)\.pm/, keys %INC;
         if( defined $method ) {
-            $method = lc $method;
             {
                 no strict 'refs';
                 my $method_run_ref = \&{"API::methods::${method}::run"};
