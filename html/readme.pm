@@ -147,7 +147,7 @@ sub print {
                 </span>
               </em>
             </p>
-        " if( defined $_[2] ); # Notes
+        " if( defined $_[2] && $_[2] ); # Notes
     };      
     my $printParameterTable = sub { # ['Parameter', 'Type', 'Required', 'Default', 'Info'], [...], ...]
         my @parameter = (    # default parameter
