@@ -234,7 +234,13 @@ sub print {
             <hr />
         ";
     };
-
+    my $printMethod = sub {
+        $printNewMethodTitle->( $_[0]->{method}, $_[0]->{title}, $_[0]->{note} );
+        $printParameterTable->( @{$_[0]->{parameterTable}} );
+        $printRequestExample->( $_[0]->{requestExample} );
+        $printReturnDataTable->( @{$_[0]->{returnDataTable}} );
+    };
+    
     print $cgi->header, $cgi->start_html(
         -title=>"API Documentation - pxe.mine.io",
         -style=>{-code=>"
@@ -332,101 +338,113 @@ sub print {
     
     $printReadmeClass->('dhcp');
     {
-        $printNewMethodTitle->( "dhcp", "Get DHCP configuration data", "The described return data will be returned with every <code>dhcp/*</code> API-Method.</br>'null' value of a return parameter corresponds to a not defined value on server." );
-        $printParameterTable->();
-        $printRequestExample->(qq~
+
+        my $returnObject = ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method=dhcp</a> for description"];
+        
+        $printMethod->({
+            method          => "dhcp",
+            title           => "Get DHCP configuration data",
+            note            => "The described return data will be returned with every <code>dhcp/*</code> API-Method.</br>'null' value of a return parameter corresponds to a not defined value on server.",
+            parameterTable  => [],
+            requestExample  => qq~
 curl -d 'method=dhcp' -X POST http://$ENV{HTTP_HOST}
-        ~);
-        $printReturnDataTable->(
-            ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration if successful"],
-            ['data:dhcp:status', 'object{}', 'yes', "Contains status information about 'isc-dhcp-service'"],
-            ['data:dhcp:status:active', 'bool', 'yes', "Running status of 'isc-dhcp-server'."],
-            ['data:dhcp:status:etimes', 'integer', 'yes || null', "Seconds since 'isc-dhcp-server' start."],
-            ['data:dhcp:status:lstart', 'string', 'yes || null', "Timestamp string of 'isc-dhcp-server' start."],
-            ['data:dhcp:groups', 'object{}', 'no', "Contains groupname-named objects for all DHCP groups. Not returned if DHCP has no groups."],
-            ['data:dhcp:groups:*', 'object{}', 'yes', "Groupname-named object for each group."],
-            ['data:dhcp:groups:*:options', 'object{}', 'no', "Contains 'strings' of the group option parameters. Not returned if group has no options!"],
-            ['data:dhcp:groups:*:options:*', 'string', 'yes', "Option-named strings of each group-option. More individual not listed options possible!"],
-            ['data:dhcp:groups:*:options:ipxe.san-filename', 'string', 'no', "'Boot-Image' name, e.g. 'amd-dev'"],
-            ['data:dhcp:groups:*:options:ipxe.username', 'string', 'no', "Mining authentication username for pool. (email-address)"],
-            ['data:dhcp:groups:*:options:ipxe.password', 'string', 'no', "Mining account address."],
-            ['data:dhcp:groups:*:options:iscsi-initiator-iqn', 'string', 'no', "Mining pool protocol, e.g. 'stratum1+tcp://'"],
-            ['data:dhcp:groups:*:options:ipxe.reverse-username', 'string', 'no', "PoolIP1:Port1 address, e.g. 'eth-eu1.nanopool.org:9999'"],
-            ['data:dhcp:groups:*:options:ipxe.reverse-password', 'string', 'no', "PoolIP2:Port2 address, e.g. 'eth-eu2.nanopool.org:9999'"],
-            ['data:dhcp:groups:*:options:vendor-class-identifier', 'string', 'no', "Unused, free dhcp option which can be used in ipxe."],
-            ['data:dhcp:groups:*:options:root-path', 'string', 'no', "Unused, free dhcp option which can be used in ipxe."],
-            ['data:dhcp:groups:*:hosts', 'object{}', 'no', "Contains hostname-named objects for all hosts in this group. Not returned for empty groups!"],
-            ['data:dhcp:groups:*:hosts:*', 'object{}', 'yes', "Hostname-named configuration object for each existing host in this group."],
-            ['data:dhcp:groups:*:hosts:*:name', 'string', 'yes', "Hostname of the host."],
-            ['data:dhcp:groups:*:hosts:*:hardware_address', 'string', 'yes', "Hardware/Mac address of the host."],
-            ['data:dhcp:groups:*:hosts:*:vivso', 'string', 'yes || null', "Contains the origin-groupname if host was moved to a <code>(.*-dev|winbios)</code> named group."],
-            ['data:dhcp:groups:*:hosts:*:lease', 'object{}', 'no', "Contains the lease information for the host. Not returned for hosts without lease!"],
-            ['data:dhcp:groups:*:hosts:*:lease:state', 'string', 'yes', "State of the lease, 'active' or 'free.'"],
-            ['data:dhcp:groups:*:hosts:*:lease:ip_address', 'string', 'yes', "IP-Address of the lease."],
-            ['data:dhcp:groups:*:hosts:*:lease:client_hostname', 'string', 'yes || null', "Client-Hostname if it was transmitted from host."],
-            ['data:dhcp:groups:*:hosts:*:lease:starts', 'integer', 'yes ', "Lease start unix-timestamp."],
-            ['data:dhcp:groups:*:hosts:*:lease:ends', 'integer', 'yes', "Lease end unix-timestamp."],
-            ['data:dhcp:leases', 'object{}', 'no', "Contains IP-Address-named objects of all dhcp leases. Not returned if DHCP has no leases."],
-            ['data:dhcp:leases:*', 'object{}', 'yes', "IP-Address-named object for each lease."],
-            ['data:dhcp:leases:*:state', 'string', 'yes', "State of the lease, 'active' or 'free'."],
-            ['data:dhcp:leases:*:client_hostname', 'string', 'yes || null', "Client-hostname if it was transmitted from host."],
-            ['data:dhcp:leases:*:hardware_address', 'string', 'yes', "Hardware/Mac address of the lease."],
-            ['data:dhcp:leases:*:starts', 'integer', 'yes', "Lease start unix-timestamp."],
-            ['data:dhcp:leases:*:ends', 'integer', 'yes', "Lease end unix-timestamp."],
-            ['data:dhcp:leases:*:host', 'object{}', 'no', "Contains the host configuration for this lease. Not returned if lease has no host!"],
-            ['data:dhcp:leases:*:host:name', 'string', 'yes', "Configured 'name' from associated host."],
-            ['data:dhcp:leases:*:host:group', 'string', 'yes', "Groupname from associated host."],
-            ['data:dhcp:leases:*:host:vivso', 'string', 'yes || null', "Contains the origin-groupname if associated host was moved to a <code>(.*-dev|winbios)</code> named group."],
-        );
-
+            ~,
+            returnDataTable => [
+                ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration if successful"],
+                ['data:dhcp:status', 'object{}', 'yes', "Contains status information about 'isc-dhcp-service'"],
+                ['data:dhcp:status:active', 'bool', 'yes', "Running status of 'isc-dhcp-server'."],
+                ['data:dhcp:status:etimes', 'integer', 'yes || null', "Seconds since 'isc-dhcp-server' start."],
+                ['data:dhcp:status:lstart', 'string', 'yes || null', "Timestamp string of 'isc-dhcp-server' start."],
+                ['data:dhcp:groups', 'object{}', 'no', "Contains groupname-named objects for all DHCP groups. Not returned if DHCP has no groups."],
+                ['data:dhcp:groups:*', 'object{}', 'yes', "Groupname-named object for each group."],
+                ['data:dhcp:groups:*:options', 'object{}', 'no', "Contains 'strings' of the group option parameters. Not returned if group has no options!"],
+                ['data:dhcp:groups:*:options:*', 'string', 'yes', "Option-named strings of each group-option. More individual not listed options possible!"],
+                ['data:dhcp:groups:*:options:ipxe.san-filename', 'string', 'no', "'Boot-Image' name, e.g. 'amd-dev'"],
+                ['data:dhcp:groups:*:options:ipxe.username', 'string', 'no', "Mining authentication username for pool. (email-address)"],
+                ['data:dhcp:groups:*:options:ipxe.password', 'string', 'no', "Mining account address."],
+                ['data:dhcp:groups:*:options:iscsi-initiator-iqn', 'string', 'no', "Mining pool protocol, e.g. 'stratum1+tcp://'"],
+                ['data:dhcp:groups:*:options:ipxe.reverse-username', 'string', 'no', "PoolIP1:Port1 address, e.g. 'eth-eu1.nanopool.org:9999'"],
+                ['data:dhcp:groups:*:options:ipxe.reverse-password', 'string', 'no', "PoolIP2:Port2 address, e.g. 'eth-eu2.nanopool.org:9999'"],
+                ['data:dhcp:groups:*:options:vendor-class-identifier', 'string', 'no', "Unused, free dhcp option which can be used in ipxe."],
+                ['data:dhcp:groups:*:options:root-path', 'string', 'no', "Unused, free dhcp option which can be used in ipxe."],
+                ['data:dhcp:groups:*:hosts', 'object{}', 'no', "Contains hostname-named objects for all hosts in this group. Not returned for empty groups!"],
+                ['data:dhcp:groups:*:hosts:*', 'object{}', 'yes', "Hostname-named configuration object for each existing host in this group."],
+                ['data:dhcp:groups:*:hosts:*:name', 'string', 'yes', "Hostname of the host."],
+                ['data:dhcp:groups:*:hosts:*:hardware_address', 'string', 'yes', "Hardware/Mac address of the host."],
+                ['data:dhcp:groups:*:hosts:*:vivso', 'string', 'yes || null', "Contains the origin-groupname if host was moved to a <code>(.*-dev|winbios)</code> named group."],
+                ['data:dhcp:groups:*:hosts:*:lease', 'object{}', 'no', "Contains the lease information for the host. Not returned for hosts without lease!"],
+                ['data:dhcp:groups:*:hosts:*:lease:state', 'string', 'yes', "State of the lease, 'active' or 'free.'"],
+                ['data:dhcp:groups:*:hosts:*:lease:ip_address', 'string', 'yes', "IP-Address of the lease."],
+                ['data:dhcp:groups:*:hosts:*:lease:client_hostname', 'string', 'yes || null', "Client-Hostname if it was transmitted from host."],
+                ['data:dhcp:groups:*:hosts:*:lease:starts', 'integer', 'yes ', "Lease start unix-timestamp."],
+                ['data:dhcp:groups:*:hosts:*:lease:ends', 'integer', 'yes', "Lease end unix-timestamp."],
+                ['data:dhcp:leases', 'object{}', 'no', "Contains IP-Address-named objects of all dhcp leases. Not returned if DHCP has no leases."],
+                ['data:dhcp:leases:*', 'object{}', 'yes', "IP-Address-named object for each lease."],
+                ['data:dhcp:leases:*:state', 'string', 'yes', "State of the lease, 'active' or 'free'."],
+                ['data:dhcp:leases:*:client_hostname', 'string', 'yes || null', "Client-hostname if it was transmitted from host."],
+                ['data:dhcp:leases:*:hardware_address', 'string', 'yes', "Hardware/Mac address of the lease."],
+                ['data:dhcp:leases:*:starts', 'integer', 'yes', "Lease start unix-timestamp."],
+                ['data:dhcp:leases:*:ends', 'integer', 'yes', "Lease end unix-timestamp."],
+                ['data:dhcp:leases:*:host', 'object{}', 'no', "Contains the host configuration for this lease. Not returned if lease has no host!"],
+                ['data:dhcp:leases:*:host:name', 'string', 'yes', "Configured 'name' from associated host."],
+                ['data:dhcp:leases:*:host:group', 'string', 'yes', "Groupname from associated host."],
+                ['data:dhcp:leases:*:host:vivso', 'string', 'yes || null', "Contains the origin-groupname if associated host was moved to a <code>(.*-dev|winbios)</code> named group."],
+            ],
+        });
         
-        $printNewMethodTitle->( "dhcp/restartservice", "Restart 'isc-dhcp-server' serivce" );
-        $printParameterTable->();
-        $printRequestExample->(qq~
+        $printMethod->({
+            method          => "dhcp/restartservice",
+            title           => "Restart 'isc-dhcp-server' serivce",
+            note            => "",
+            parameterTable  => [],
+            requestExample  => qq~
 curl -d 'nodata=1&method=dhcp/restartservice' -X POST http://$ENV{HTTP_HOST}
-        ~);
-        $printReturnDataTable->(
-            ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method=dhcp</a> for description"],
-        );
+            ~,
+            returnDataTable => [ $returnObject ],
+        });
 
-        
-        $printNewMethodTitle->( "dhcp/addhost", "Add a host" );
-        $printParameterTable->(
-            ['json:group', 'string', 'true', '', "name of the existing 'group' where host will be added"],
-            ['json:name', 'string', 'true', '', "'name' of the host"],
-            ['json:mac', 'string', 'true', '', "'mac'-address of the host"],
-        );
-        $printRequestExample->(qq~
+        $printMethod->({
+            method          => "dhcp/addhost",
+            title           => "Add a host",
+            note            => "",
+            parameterTable  => [
+                ['json:group', 'string', 'true', '', "name of the existing 'group' where host will be added"],
+                ['json:name', 'string', 'true', '', "'name' of the host"],
+                ['json:mac', 'string', 'true', '', "'mac'-address of the host"],
+            ],
+            requestExample  => qq~
 curl -d 'nodata=1&method=dhcp/addhost&json={"group":"monsterGroup","name":"powerRig","mac":"11:22:33:44:55:66"}' -X POST http://$ENV{HTTP_HOST}
-        ~);
-        $printReturnDataTable->(
-            ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method=dhcp</a> for description"],
-        );
+            ~,
+            returnDataTable => [ $returnObject ],
+        });
 
-        
-        $printNewMethodTitle->( "dhcp/removehost", "Remove a host" );
-        $printParameterTable->(
-            ['json:name', 'string', 'or mac', '', "'name' of the host"],
-            ['json:mac', 'string', 'or name', '', "'mac'-address of the host"],
-        );
-        $printRequestExample->(qq~
+        $printMethod->({
+            method          => "dhcp/removehost",
+            title           => "Remove a host",
+            note            => "",
+            parameterTable  => [
+                ['json:name', 'string', 'or mac', '', "'name' of the host"],
+                ['json:mac', 'string', 'or name', '', "'mac'-address of the host"],
+            ],
+            requestExample  => qq~
 curl -d 'nodata=1&method=dhcp/removehost&json={"name":"powerRig"}' -X POST http://$ENV{HTTP_HOST}
 curl -d 'nodata=1&method=dhcp/removehost&json={"mac":"11:22:33:44:55:66"}' -X POST http://$ENV{HTTP_HOST}
-        ~);
-        $printReturnDataTable->(
-            ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method=dhcp</a> for description"],
-        );
+            ~,
+            returnDataTable => [ $returnObject ],
+        });
 
-        
-        $printNewMethodTitle->( "dhcp/alterhost", "Alter a host (<code>Change</code> group <code>and/or</code> name <code>and/or</code> mac-address)", "If the host will be moved to a group with name <code>(.*-dev|winbios)</code> the host-parameter <code>'vivso'</code> will be set with the origin-group-name to move the host easy back to its original-group." );
-        $printParameterTable->(
-            ['json:name', 'string', 'or mac', '', "'name' of the host"],
-            ['json:mac', 'string', 'or name', '', "'mac'-address of the host"],
-            ['json:group', 'string', 'and/or newmac|newname', '', "Name of the target 'group' where host will be moved to."],
-            ['json:newname', 'string', 'and/or group|newmac', '', "Host will be renamed to this 'newname'."],
-            ['json:newmac', 'string', 'and/or group|newname', '', "Mac-Address will be changed to this 'newmac'."],
-        );
-        $printRequestExample->(qq~
+        $printMethod->({
+            method          => "dhcp/alterhost",
+            title           => "Alter a host (<code>Change</code> group <code>and/or</code> name <code>and/or</code> mac-address)",
+            note            => "If the host will be moved to a group with name <code>(.*-dev|winbios)</code> the host-parameter <code>'vivso'</code> will be set with the origin-group-name to move the host easy back to its original-group.",
+            parameterTable  => [
+                ['json:name', 'string', 'or mac', '', "'name' of the host"],
+                ['json:mac', 'string', 'or name', '', "'mac'-address of the host"],
+                ['json:group', 'string', 'and/or newmac|newname', '', "Name of the target 'group' where host will be moved to."],
+                ['json:newname', 'string', 'and/or group|newmac', '', "Host will be renamed to this 'newname'."],
+                ['json:newmac', 'string', 'and/or group|newname', '', "Mac-Address will be changed to this 'newmac'."],
+            ],
+            requestExample  => qq~
 # Move host to another 'group' (select by 'name' or 'mac'), keep current 'name' and 'mac'
 curl -d 'nodata=1&method=dhcp/alterhost&json={"name":"powerRig","group":"megaGroup"}' -X POST http://$ENV{HTTP_HOST}
 curl -d 'nodata=1&method=dhcp/alterhost&json={"mac":"11:22:33:44:55:66","group":"megaGroup"}' -X POST http://$ENV{HTTP_HOST}
@@ -448,45 +466,48 @@ curl -d 'nodata=1&method=dhcp/alterhost&json={"name":"powerRig","group":"megaGro
 curl -d 'nodata=1&method=dhcp/alterhost&json={"mac":"11:22:33:44:55:66","group":"megaGroup","newmac":"66:55:44:33:22:11"}' -X POST http://$ENV{HTTP_HOST}
 curl -d 'nodata=1&method=dhcp/alterhost&json={"name":"powerRig","newname":"ultraMiner","newmac":"66:55:44:33:22:11"}' -X POST http://$ENV{HTTP_HOST}
 curl -d 'nodata=1&method=dhcp/alterhost&json={"mac":"11:22:33:44:55:66","newname":"ultraMiner","newmac":"66:55:44:33:22:11"}' -X POST http://$ENV{HTTP_HOST}
-        ~);
-        $printReturnDataTable->(
-            ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method=dhcp</a> for description"],
-        );
+            ~,
+            returnDataTable => [ $returnObject ],
+        });
 
-        
-        $printNewMethodTitle->( "dhcp/addgroup", "Add a group" );
-        $printParameterTable->(
-            ['json:group', 'string', 'true', '', "name of the new 'group'"],
-            ['json:options', 'array[]', 'true', '', qq~array[] of config 'option'-objects{} for the group</br>[{"name":"op","value":"a","quoted":1},{..},..]~],
-        );
-        $printRequestExample->(qq~
+        $printMethod->({
+            method          => "dhcp/addgroup",
+            title           => "Add a group",
+            note            => "",
+            parameterTable  => [
+                ['json:group', 'string', 'true', '', "name of the new 'group'"],
+                ['json:options', 'array[]', 'true', '', qq~array[] of config 'option'-objects{} for the group</br>[{"name":"op","value":"a","quoted":1},{..},..]~],
+            ],
+            requestExample  => qq~
 curl -d 'nodata=1&method=dhcp/addgroup&json={"group":"monsterGroup","options":[]}' -X POST http://$ENV{HTTP_HOST}
 curl -d 'nodata=1&method=dhcp/addgroup&json={"group":"monsterGroup","options":[{"name":"foo","value":"bar","quoted":1}]}' -X POST http://$ENV{HTTP_HOST}
-        ~);
-        $printReturnDataTable->(
-            ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method=dhcp</a> for description"],
-        );
+            ~,
+            returnDataTable => [ $returnObject ],
+        });
 
-        
-        $printNewMethodTitle->( "dhcp/removegroup", "Remove a group", "The group must be empty (move/remove hosts first)." );
-        $printParameterTable->(
-            ['json:group', 'string', 'true', '', "name of the 'group' which will be removed"],
-        );
-        $printRequestExample->(qq~
+        $printMethod->({
+            method          => "dhcp/removegroup",
+            title           => "Remove a group",
+            note            => "The group must be empty (move/remove hosts first).",
+            parameterTable  => [
+                ['json:group', 'string', 'true', '', "name of the 'group' which will be removed"],
+            ],
+            requestExample  => qq~
 curl -d 'nodata=1&method=dhcp/removegroup&json={"group":"monsterGroup"}' -X POST http://$ENV{HTTP_HOST}
-        ~);
-        $printReturnDataTable->(
-            ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method=dhcp</a> for description"],
-        );
+            ~,
+            returnDataTable => [ $returnObject ],
+        });
 
-        
-        $printNewMethodTitle->( "dhcp/altergroup", "Alter a group (<code>Change</code> name <code>and/or</code> options)" );
-        $printParameterTable->(
-            ['json:group', 'string', 'true', '', "name of the 'group' to alter"],
-            ['json:name', 'string', 'or/and options', '', "rename the group to this new 'name'"],
-            ['json:options', 'array[]', 'or/and name', '', qq~replace all 'options' of the group with this 'options'</br>[{"name":"op","value":"a","quoted":1},{..},..]~],
-        );
-        $printRequestExample->(qq~
+        $printMethod->({
+            method          => "dhcp/altergroup",
+            title           => "Alter a group (<code>Change</code> name <code>and/or</code> options)",
+            note            => "",
+            parameterTable  => [
+                ['json:group', 'string', 'true', '', "name of the 'group' to alter"],
+                ['json:name', 'string', 'or/and options', '', "rename the group to this new 'name'"],
+                ['json:options', 'array[]', 'or/and name', '', qq~replace all 'options' of the group with this 'options'</br>[{"name":"op","value":"a","quoted":1},{..},..]~],
+            ],
+            requestExample  => qq~
 # Rename group and keep current options.
 curl -d 'nodata=1&method=dhcp/altergroup&json={"group":"megaGroup","name":"monsterGroup"}' -X POST http://$ENV{HTTP_HOST}
 
@@ -495,22 +516,26 @@ curl -d 'nodata=1&method=dhcp/altergroup&json={"group":"megaGroup","name":"monst
 
 # Replace the options and keep the current name.
 curl -d 'nodata=1&method=dhcp/altergroup&json={"group":"megaGroup","options":[{"name":"foo","value":"bar","quoted":1}]}' -X POST http://$ENV{HTTP_HOST}
-        ~);
-        $printReturnDataTable->(
-            ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method=dhcp</a> for description"],
-        );
+            ~,
+            returnDataTable => [ $returnObject ],
+        });
+
     }
     
     $printReadmeClass->('eth');
     {
-        # $printNewMethodTitle->( "eth", "Get ETH data", "What a cool Note!" );
-        # $printParameterTable->();
-        # $printRequestExample->(qq~
-# Do something cool
-        # ~);
-        # $printReturnDataTable->(
-            # ['data:eth', 'object{}', 'yes', "Contains ETH Data, view <a href='#eth'>method=eth</a> for description"],
-        # );
+
+        # my $returnObject = ['data:eth', 'object{}', 'yes', "Contains ETH Data, view <a href='#eth'>method=eth</a> for description"];
+
+        # $printMethod->({
+            # method          => "eth",
+            # title           => "Get ETH data",
+            # note            => "What a cool Note!",
+            # parameterTable  => [],
+            # requestExample  => qq~Do something cool~,
+            # returnDataTable => [ $returnObject ],
+        # });
+
         1;
     }
     
