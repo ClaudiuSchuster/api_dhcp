@@ -125,7 +125,7 @@ sub print {
               </br>
               <hr />
               </br>
-              <h2 id='$_[0]'>".(uc $_[0])." <code class='method'>method=$_[0] || method=$_[0].*</code></h2>
+              <h2 id='$_[0]'>".(uc $_[0])." <code class='method'>method: $_[0] || $_[0].*</code></h2>
               <div class='indented'>
                 <hr />
             ";
@@ -134,7 +134,7 @@ sub print {
     my $printMethod = sub {
         my $printNewMethodTitle = sub { # 'Method', 'Description', 'Note'
             print "
-                <h3>$_[1] <code class='method'>method=$_[0]</code> </h3>
+                <h3>$_[1] <code class='method'>method: $_[0]</code> </h3>
             ";
             print "
                 <p>
