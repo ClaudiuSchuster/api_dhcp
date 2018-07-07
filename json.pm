@@ -20,14 +20,18 @@ sub print {
             rc => 200,
             msg => undef,
             method => undef,
-            json => undef
+            postdata => undef
         },
         data => {}
     };
+    eval { $json_ref->{meta}{postdata} = decode_json( $cgi->param('POSTDATA') || "{}" ); 1; } or do { 
+        $json_ref->{meta}{rc}  = 400;
+        $json_ref->{meta}{msg} = 'error.decode_json: '.$@;
+    };
     
     ### Check if module for requested method is loaded, execute the method and fill the data{}-object
-    if( defined $cgi->param('method') ) {
-        my ($method) = grep { $cgi->param('method') =~ /^($_|$_\/?\w*)$/ }  map /methods\/(\w+)\.pm/, keys %INC;
+    if( defined $json_ref->{meta}{postdata}{method} ) {
+        my ($method) = grep { $json_ref->{meta}{postdata}{method} =~ /^($_|$_\/?\w*)$/ }  map /methods\/(\w+)\.pm/, keys %INC;
         if( defined $method ) {
             {
                 no strict 'refs';
@@ -35,7 +39,7 @@ sub print {
                 my $method_run_result = $method_run_ref->($cgi,$json_ref);
                 $json_ref->{'data'}{$method} = $method_run_result->{data};
             }
-            $json_ref->{'data'}{$method} = {} if( $cgi->param('nodata') );
+            $json_ref->{'data'}{$method} = {} if( $json_ref->{meta}{postdata}{nodata} );
         }
     }
     
