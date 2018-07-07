@@ -8,14 +8,14 @@ use JSON;
 
 
 sub run {
-    my $q = shift;  # CGI-Object
+    my $cgi = shift;
     my $json = shift;
     ####################  Initialize some stuff...  #########################
     my $dhcpdPath = '/usr/sbin/dhcpd';
     my $filename = '/etc/dhcp/dhcpd.conf';
     my $leasefile = '/var/lib/dhcp/dhcpd.leases';
-    $json->{meta}{method} = 'dhcp' if($json->{meta}{postdata}{method} eq 'dhcp');
-    my $postdata = $json->{meta}{postdata}{params} || undef;
+    $json->{meta}{method} = $json->{meta}{postdata}{method} if( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq 'dhcp');
+    my $params = $json->{meta}{postdata}{params} || undef;
     #########################################################################
     
     ###################  Parsing dhcpd.conf and leases  #####################
@@ -50,8 +50,8 @@ sub run {
     #########################################################################
 
     ########################  dhcp/restartservice  ##########################
-    if( $json->{meta}{postdata}{method} eq "dhcp.restartservice" ) {
-        my $content = API::helpers::trim(`service isc-dhcp-server restart`);
+    if( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.restartservice" ) {
+        my $content = API::helpers::trim(`service isc-dhcp-server restart 2>&1`);
         $json->{meta}{method} = $json->{meta}{postdata}{method};
         if( defined $content && $content eq "" ) {
             $json->{'meta'}{'msg'} = undef;
@@ -62,10 +62,10 @@ sub run {
         }
     }
     ########################  dhcp/addhost         ##########################
-    elsif( $json->{meta}{postdata}{method} eq "dhcp.addhost" ) {
+    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.addhost" ) {
         $json->{meta}{method} = $json->{meta}{postdata}{method};
-        if ( ref($postdata) eq 'HASH' ) {
-            unless( $postdata->{group} && $postdata->{name} && $postdata->{mac} ) {
+        if ( ref($params) eq 'HASH' ) {
+            unless( $params->{group} && $params->{name} && $params->{mac} ) {
                 $json->{meta}{rc}  = 400;
                 $json->{meta}{msg} = "Insufficient arguments submitted: 'group + name + mac' are needed!";
             } else {
@@ -73,34 +73,34 @@ sub run {
                     for my $host ( @{$group->hosts} ) {
                         my $mac = $host->_children->[0]->{value};
                         my $name = $host->{name};
-                        if( $postdata->{name} =~ /$name/i ) {
+                        if( $params->{name} =~ /$name/i ) {
                             $json->{meta}{rc}  = 400;
-                            $json->{meta}{msg} = "Host name '".$postdata->{name}."' already exist. Abort!";
-                        } elsif ( $postdata->{mac} =~ /$mac/i) {
+                            $json->{meta}{msg} = "Host name '".$params->{name}."' already exist. Abort!";
+                        } elsif ( $params->{mac} =~ /$mac/i) {
                             $json->{meta}{rc}  = 400;
-                            $json->{meta}{msg} = "Host hardware_address '".$postdata->{mac}."' already exist. Abort!";
+                            $json->{meta}{msg} = "Host hardware_address '".$params->{mac}."' already exist. Abort!";
                         }
                         last if( $json->{meta}{rc} >= 400 );
                     }
                     last if( $json->{meta}{rc} >= 400 );
                 }
                 if ($json->{meta}{rc} == 200) {
-                    my @group = $config->find_groups({ name => $postdata->{group} });
+                    my @group = $config->find_groups({ name => $params->{group} });
                     if( scalar @group ) {
                         unless (
                             $group[0]->add_host({
-                                name => $postdata->{name},
-                                hardwareethernet => [{ value => $postdata->{mac} }]
+                                name => $params->{name},
+                                hardwareethernet => [{ value => $params->{mac} }]
                             })
                         ) {
                             $json->{meta}{rc}  = 500;
-                            $json->{meta}{msg} = "Failure during addhost name: '".$postdata->{name}."' mac: '".$postdata->{mac}."' in group: '".$postdata->{group}."'!";
+                            $json->{meta}{msg} = "Failure during addhost name: '".$params->{name}."' mac: '".$params->{mac}."' in group: '".$params->{group}."'!";
                         } else {
                             $writeDhcpdConf_sub->();
                         }
                     } else {
                         $json->{meta}{rc}  = 400;
-                        $json->{meta}{msg} = "Target group '".$postdata->{group}."' not found. Abort!";
+                        $json->{meta}{msg} = "Target group '".$params->{group}."' not found. Abort!";
                     }
                 }
             }
@@ -110,10 +110,10 @@ sub run {
         }
     }
     ########################  dhcp/removehost      ##########################
-    elsif( $json->{meta}{postdata}{method} eq "dhcp.removehost" ) {
+    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.removehost" ) {
         $json->{meta}{method} = $json->{meta}{postdata}{method};
-        if ( ref($postdata) eq 'HASH' ) {
-            unless( $postdata->{name} || $postdata->{mac} ) {
+        if ( ref($params) eq 'HASH' ) {
+            unless( $params->{name} || $params->{mac} ) {
                 $json->{meta}{rc}  = 400;
                 $json->{meta}{msg} = "Insufficient arguments submitted: 'name' or 'mac' are needed!";
             } else {
@@ -122,7 +122,7 @@ sub run {
                     for my $host ( @{$group->hosts} ) {
                         my $mac = $host->_children->[0]->{value};
                         my $name = $host->{name};
-                        if( (defined $postdata->{name} && $postdata->{name} =~ /$name/i) || (defined $postdata->{mac} && $postdata->{mac} =~ /$mac/i) ) {
+                        if( (defined $params->{name} && $params->{name} =~ /$name/i) || (defined $params->{mac} && $params->{mac} =~ /$mac/i) ) {
                             $removable = { host => $host, group => $group, found => 1 };
                             last;
                         }
@@ -131,7 +131,7 @@ sub run {
                 }
                 unless( $removable->{found} ) {
                     $json->{meta}{rc}  = 400;
-                    $json->{meta}{msg} = "Host name or mac '".($postdata->{name} ? $postdata->{name} : $postdata->{mac})."' not found for removal. Abort!";
+                    $json->{meta}{msg} = "Host name or mac '".($params->{name} ? $params->{name} : $params->{mac})."' not found for removal. Abort!";
                 }
                 if ($json->{meta}{rc} == 200) {
                     unless ( $removable->{group}->remove_hosts($removable->{host}) ) {
@@ -148,10 +148,10 @@ sub run {
         }
     }
     ########################  dhcp/alterhost        ##########################
-    elsif( $json->{meta}{postdata}{method} eq "dhcp.alterhost" ) {
+    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.alterhost" ) {
         $json->{meta}{method} = $json->{meta}{postdata}{method};
-        if ( ref($postdata) eq 'HASH' ) {
-            unless( ($postdata->{name} || $postdata->{mac}) && ($postdata->{group} || $postdata->{newname} || $postdata->{newmac}) ) {
+        if ( ref($params) eq 'HASH' ) {
+            unless( ($params->{name} || $params->{mac}) && ($params->{group} || $params->{newname} || $params->{newmac}) ) {
                 $json->{meta}{rc}  = 400;
                 $json->{meta}{msg} = "Insufficient arguments submitted: ('name' or 'mac') and ('group' or 'newname' or 'newmac') are required!";
             } else {
@@ -160,7 +160,7 @@ sub run {
                     for my $host ( @{$group->hosts} ) {
                         my $mac = $host->_children->[0]->{value};
                         my $name = $host->{name};
-                        if( (defined $postdata->{name} && $postdata->{name} =~ /$name/i) || (defined $postdata->{mac} && $postdata->{mac} =~ /$mac/i) ) {
+                        if( (defined $params->{name} && $params->{name} =~ /$name/i) || (defined $params->{mac} && $params->{mac} =~ /$mac/i) ) {
                             $movable = { host => $host, group => $group };
                             last;
                         }
@@ -169,50 +169,50 @@ sub run {
                 }
                 unless( $movable ) {
                     $json->{meta}{rc}  = 400;
-                    $json->{meta}{msg} = "Host name or mac '".($postdata->{name} ? $postdata->{name} : $postdata->{mac})."' not found for move. Abort!";
+                    $json->{meta}{msg} = "Host name or mac '".($params->{name} ? $params->{name} : $params->{mac})."' not found for move. Abort!";
                 } else {
                     for my $group ( $config->find_groups({}) ) {
                         for my $host ( @{$group->hosts} ) {
                             my $mac = $host->_children->[0]->{value};
                             my $name = $host->{name};
-                            if( defined $postdata->{newname} && $postdata->{newname} =~ /$name/i ) {
+                            if( defined $params->{newname} && $params->{newname} =~ /$name/i ) {
                                 $json->{meta}{rc}  = 400;
-                                $json->{meta}{msg} = "Host 'newname' '".$postdata->{newname}."' already exist. Abort!";
-                            } elsif ( defined $postdata->{newmac} && $postdata->{newmac} =~ /$mac/i) {
+                                $json->{meta}{msg} = "Host 'newname' '".$params->{newname}."' already exist. Abort!";
+                            } elsif ( defined $params->{newmac} && $params->{newmac} =~ /$mac/i) {
                                 $json->{meta}{rc}  = 400;
-                                $json->{meta}{msg} = "Host 'newmac' '".$postdata->{newmac}."' already exist. Abort!";
+                                $json->{meta}{msg} = "Host 'newmac' '".$params->{newmac}."' already exist. Abort!";
                             }
                             last if( $json->{meta}{rc} >= 400 );
                         }
                         last if( $json->{meta}{rc} >= 400 );
                     }
                     if ($json->{meta}{rc} == 200) {
-                        $postdata->{group} = $movable->{group}->{name} unless( defined $postdata->{group} );
-                        my @newGroup = $config->find_groups({ name => $postdata->{group} });
+                        $params->{group} = $movable->{group}->{name} unless( defined $params->{group} );
+                        my @newGroup = $config->find_groups({ name => $params->{group} });
                         if( scalar @newGroup ) {
                             if ( $movable->{group}->remove_hosts($movable->{host}) ) {
-                                if ( $postdata->{group} =~ /winbios|.*-dev/ && defined $postdata->{name} && $postdata->{name} !~ /pxe.test.*/i) {
+                                if ( $params->{group} =~ /winbios|.*-dev/ && defined $params->{name} && $params->{name} !~ /pxe.test.*/i) {
                                     unless (
                                         $newGroup[0]->add_host({
-                                            name => defined $postdata->{newname} ? $postdata->{newname} : $movable->{host}->{name},
-                                            hardwareethernet =>  defined $postdata->{newmac} ? [{ value => $postdata->{newmac} }] : [{ value => $movable->{host}->_children->[0]->{value} }],
+                                            name => defined $params->{newname} ? $params->{newname} : $movable->{host}->{name},
+                                            hardwareethernet =>  defined $params->{newmac} ? [{ value => $params->{newmac} }] : [{ value => $movable->{host}->_children->[0]->{value} }],
                                             options => [{ name => "vivso", value => $movable->{group}->{name}, quoted => 1 }]
                                         })
                                     ) {
                                         $json->{meta}{rc}  = 500;
-                                        $json->{meta}{msg} = "Failure during addhost-'with vivso' of '".$postdata->{name}."' in group '".$postdata->{target}."'!";
+                                        $json->{meta}{msg} = "Failure during addhost-'with vivso' of '".$params->{name}."' in group '".$params->{target}."'!";
                                     } else {
                                         $writeDhcpdConf_sub->();
                                     }
                                 } else {
                                     unless (
                                         $newGroup[0]->add_host({
-                                            name => defined $postdata->{newname} ? $postdata->{newname} : $movable->{host}->{name},
-                                            hardwareethernet => defined $postdata->{newmac} ? [{ value => $postdata->{newmac} }] : [{ value => $movable->{host}->_children->[0]->{value} }]
+                                            name => defined $params->{newname} ? $params->{newname} : $movable->{host}->{name},
+                                            hardwareethernet => defined $params->{newmac} ? [{ value => $params->{newmac} }] : [{ value => $movable->{host}->_children->[0]->{value} }]
                                         })
                                     ) {
                                         $json->{meta}{rc}  = 500;
-                                        $json->{meta}{msg} = "Failure during addhost of '".$postdata->{name}."' in group '".$postdata->{target}."'!";
+                                        $json->{meta}{msg} = "Failure during addhost of '".$params->{name}."' in group '".$params->{target}."'!";
                                     } else {
                                         $writeDhcpdConf_sub->();
                                     }
@@ -223,7 +223,7 @@ sub run {
                             }
                         } else {
                             $json->{meta}{rc}  = 400;
-                            $json->{meta}{msg} = "Target group '".$postdata->{group}."' not found. Abort!";
+                            $json->{meta}{msg} = "Target group '".$params->{group}."' not found. Abort!";
                         }
                     }
                 }
@@ -234,32 +234,32 @@ sub run {
         }
     }
     ########################  dhcp/addgroup        ##########################
-    elsif( $json->{meta}{postdata}{method} eq "dhcp.addgroup" ) {
+    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.addgroup" ) {
         $json->{meta}{method} = $json->{meta}{postdata}{method};
-        if ( ref($postdata) eq 'HASH' ) {
-            unless( $postdata->{group} && $postdata->{options} ) {
+        if ( ref($params) eq 'HASH' ) {
+            unless( $params->{group} && $params->{options} ) {
                 $json->{meta}{rc}  = 400;
                 $json->{meta}{msg} = "Insufficient arguments submitted: 'name + options' are needed! options = [] or ".'[{"name":"op","value":"a","quoted":1},{..},..]';
             } else {
-                if( ref($postdata->{options}) eq 'ARRAY' && ref(${$postdata->{options}}[0]) eq 'HASH' && !${$postdata->{options}}[0]->{name} && !${$postdata->{options}}[0]->{value} && !${$postdata->{options}}[0]->{quoted}
-                  || ref($postdata->{options}) eq 'ARRAY' && ${$postdata->{options}}[0] && ref(${$postdata->{options}}[0]) ne 'HASH' 
-                  || ref($postdata->{options}) ne 'ARRAY' ) {
+                if( ref($params->{options}) eq 'ARRAY' && ref(${$params->{options}}[0]) eq 'HASH' && !${$params->{options}}[0]->{name} && !${$params->{options}}[0]->{value} && !${$params->{options}}[0]->{quoted}
+                  || ref($params->{options}) eq 'ARRAY' && ${$params->{options}}[0] && ref(${$params->{options}}[0]) ne 'HASH' 
+                  || ref($params->{options}) ne 'ARRAY' ) {
                     $json->{meta}{rc}  = 400;
                     $json->{meta}{msg} = "Options Argument must be an empty list or a list of options-objects. Abort! options = ".'[{"name":"op","value":"a","quoted":1},{..},..]';
                 } else {
-                    my @group = $config->find_groups({ name => $postdata->{group} });
+                    my @group = $config->find_groups({ name => $params->{group} });
                     if( scalar @group ) {
                         $json->{meta}{rc}  = 400;
-                        $json->{meta}{msg} = "Group name '".$postdata->{group}."' already exist. Abort!";
+                        $json->{meta}{msg} = "Group name '".$params->{group}."' already exist. Abort!";
                     } else {
                         unless (
                             $config->add_group({
-                                name => $postdata->{group},
-                                options => $postdata->{options}   # options => [{ name => "root-path", value => "value", quoted => 1 }]
+                                name => $params->{group},
+                                options => $params->{options}   # options => [{ name => "root-path", value => "value", quoted => 1 }]
                             })
                         ) {
                             $json->{meta}{rc}  = 500;
-                            $json->{meta}{msg} = "Failure during add_group with name: '".$postdata->{group}." and options: '".$postdata->{options}."'!";
+                            $json->{meta}{msg} = "Failure during add_group with name: '".$params->{group}." and options: '".$params->{options}."'!";
                         } else {
                             $writeDhcpdConf_sub->();
                         }
@@ -272,17 +272,17 @@ sub run {
         }
     }
     ########################  dhcp/removegroup     ##########################
-    elsif( $json->{meta}{postdata}{method} eq "dhcp.removegroup" ) {
+    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.removegroup" ) {
         $json->{meta}{method} = $json->{meta}{postdata}{method};
-        if ( ref($postdata) eq 'HASH' ) {
-            unless( $postdata->{group} ) {
+        if ( ref($params) eq 'HASH' ) {
+            unless( $params->{group} ) {
                 $json->{meta}{rc}  = 400;
                 $json->{meta}{msg} = "Insufficient arguments submitted: 'group' are needed!";
             } else {
-                my @group = $config->find_groups({ name => $postdata->{group} });
+                my @group = $config->find_groups({ name => $params->{group} });
                 if( !scalar @group ) {
                     $json->{meta}{rc}  = 400;
-                    $json->{meta}{msg} = "Group name '".$postdata->{group}."' not found for removal. Abort!";
+                    $json->{meta}{msg} = "Group name '".$params->{group}."' not found for removal. Abort!";
                 } elsif ( scalar @{$group[0]->hosts} > 0) {
                     $json->{meta}{rc}  = 400;
                     $json->{meta}{msg} = "Group '".$group[0]->{name}."' has '".(scalar @{$group[0]->hosts})."' hosts inside. Move or delete hosts before group removal. Abort!";
@@ -301,39 +301,39 @@ sub run {
         }
     }
     ########################  dhcp/altergroup      ##########################
-    elsif( $json->{meta}{postdata}{method} eq "dhcp.altergroup" ) {
+    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.altergroup" ) {
         $json->{meta}{method} = $json->{meta}{postdata}{method};
-        if ( ref($postdata) eq 'HASH' ) {
-            unless( $postdata->{group} && ($postdata->{options} || $postdata->{name}) ) {
+        if ( ref($params) eq 'HASH' ) {
+            unless( $params->{group} && ($params->{options} || $params->{name}) ) {
                 $json->{meta}{rc}  = 400;
                 $json->{meta}{msg} = "Insufficient arguments submitted: 'group' and ('name' or/and 'options') are required! options = ".'[{"name":"op","value":"a","quoted":1},{..},..]';
             }
             if ($json->{meta}{rc} == 200) {
-                if( defined $postdata->{options} && ref($postdata->{options}) eq 'ARRAY' && ref(${$postdata->{options}}[0]) eq 'HASH' && (!${$postdata->{options}}[0]->{name} || !${$postdata->{options}}[0]->{value} || !${$postdata->{options}}[0]->{quoted})
-                  || defined $postdata->{options} && ref($postdata->{options}) eq 'ARRAY' && ${$postdata->{options}}[0] && ref(${$postdata->{options}}[0]) ne 'HASH' ) {
+                if( defined $params->{options} && ref($params->{options}) eq 'ARRAY' && ref(${$params->{options}}[0]) eq 'HASH' && (!${$params->{options}}[0]->{name} || !${$params->{options}}[0]->{value} || !${$params->{options}}[0]->{quoted})
+                  || defined $params->{options} && ref($params->{options}) eq 'ARRAY' && ${$params->{options}}[0] && ref(${$params->{options}}[0]) ne 'HASH' ) {
                     $json->{meta}{rc}  = 400;
                     $json->{meta}{msg} = "Options Argument must be an empty list or a list of options-objects. Abort! options = ".'[{"name":"op","value":"a","quoted":1},{..},..]';
                 }
                 if ($json->{meta}{rc} == 200) {
-                    my @group = $config->find_groups({ name => $postdata->{group} });
+                    my @group = $config->find_groups({ name => $params->{group} });
                     unless( scalar @group ) {
                         $json->{meta}{rc}  = 400;
-                        $json->{meta}{msg} = "Group name '".$postdata->{group}."' not found for altering. Abort!";
+                        $json->{meta}{msg} = "Group name '".$params->{group}."' not found for altering. Abort!";
                     } else {
-                        if( defined $postdata->{name} ) {
-                            my @newgroup = $config->find_groups({ name => $postdata->{name} });
+                        if( defined $params->{name} ) {
+                            my @newgroup = $config->find_groups({ name => $params->{name} });
                             if( scalar @newgroup ) {
                                 $json->{meta}{rc}  = 400;
-                                $json->{meta}{msg} = "Target group name '".$postdata->{name}."' already exists. Abort!";
+                                $json->{meta}{msg} = "Target group name '".$params->{name}."' already exists. Abort!";
                             } else {
                                 unless (
                                     $config->add_group({
-                                        name => $postdata->{name},
-                                        options => defined $postdata->{options} ? $postdata->{options} : [$group[0]->options]
+                                        name => $params->{name},
+                                        options => defined $params->{options} ? $params->{options} : [$group[0]->options]
                                     })
                                 ) {
                                     $json->{meta}{rc}  = 500;
-                                    $json->{meta}{msg} = "Failure during add_group with name: '".$postdata->{group}." and options: '".$group[0]->{options}."'!";
+                                    $json->{meta}{msg} = "Failure during add_group with name: '".$params->{group}." and options: '".$group[0]->{options}."'!";
                                 } else {
                                     unless ( scalar @{$group[0]->hosts} ) { # group has no hosts
                                         unless ( $config->remove_groups($group[0]) ) {
@@ -343,7 +343,7 @@ sub run {
                                             $writeDhcpdConf_sub->();
                                         }
                                     } else  { # group has hosts
-                                        @newgroup = $config->find_groups({ name => $postdata->{name} });
+                                        @newgroup = $config->find_groups({ name => $params->{name} });
                                         unless ( scalar @newgroup ) {
                                             $json->{meta}{rc}  = 500;
                                             $json->{meta}{msg} = "Failure during requesting new created group. Abort!";
@@ -382,9 +382,9 @@ sub run {
                                 $json->{meta}{rc}  = 500;
                                 $json->{meta}{msg} = "Failure during removal of options from group: '".$group[0]->{name}."' !";
                             } else {
-                                $optionscount = scalar @{$postdata->{options}};
+                                $optionscount = scalar @{$params->{options}};
                                 $processedOptions = 0;
-                                for ( @{$postdata->{options}} ) {
+                                for ( @{$params->{options}} ) {
                                     $processedOptions++ if $group[0]->add_option($_);
                                 }
                                 unless ( $optionscount == $processedOptions ) {
