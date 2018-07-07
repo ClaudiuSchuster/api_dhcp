@@ -25,3 +25,8 @@
      
     [Install]
     WantedBy=multi-user.target
+
+
+### Perl DEPENDENCIES:
+ - HTTP-Server-Simple-CGI-PreFork   (requires IPv6 and debian packages 'libssl-dev' & 'libz-dev')
+ - JSON
