@@ -15,7 +15,7 @@ sub run {
     my $filename = '/etc/dhcp/dhcpd.conf';
     my $leasefile = '/var/lib/dhcp/dhcpd.leases';
     $json->{meta}{method} = 'dhcp' if($json->{meta}{postdata}{method} eq 'dhcp');
-    my $postdata = $json->{meta}{postdata}{data} || undef;
+    my $postdata = $json->{meta}{postdata}{params} || undef;
     #########################################################################
     
     ###################  Parsing dhcpd.conf and leases  #####################
@@ -106,7 +106,7 @@ sub run {
             }
         } else {
             $json->{meta}{rc}  = 400;
-            $json->{meta}{msg} = "No data object for method submitted. Abort!";
+            $json->{meta}{msg} = "No 'params' object{} for method-parameter submitted. Abort!";
         }
     }
     ########################  dhcp/removehost      ##########################
@@ -144,7 +144,7 @@ sub run {
             }
         } else {
             $json->{meta}{rc}  = 400;
-            $json->{meta}{msg} = "No data object for method submitted. Abort!";
+            $json->{meta}{msg} = "No 'params' object{} for method-parameter submitted. Abort!";
         }
     }
     ########################  dhcp/alterhost        ##########################
@@ -230,7 +230,7 @@ sub run {
             }
         } else {
             $json->{meta}{rc}  = 400;
-            $json->{meta}{msg} = "No data object for method submitted. Abort!";
+            $json->{meta}{msg} = "No 'params' object{} for method-parameter submitted. Abort!";
         }
     }
     ########################  dhcp/addgroup        ##########################
@@ -268,7 +268,7 @@ sub run {
             }
         } else {
             $json->{meta}{rc}  = 400;
-            $json->{meta}{msg} = "No data object for method submitted. Abort!";
+            $json->{meta}{msg} = "No 'params' object{} for method-parameter submitted. Abort!";
         }
     }
     ########################  dhcp/removegroup     ##########################
@@ -297,7 +297,7 @@ sub run {
             }
         } else {
             $json->{meta}{rc}  = 400;
-            $json->{meta}{msg} = "No data object for method submitted. Abort!";
+            $json->{meta}{msg} = "No 'params' object{} for method-parameter submitted. Abort!";
         }
     }
     ########################  dhcp/altergroup      ##########################
@@ -400,7 +400,7 @@ sub run {
             }
         } else {
             $json->{meta}{rc}  = 400;
-            $json->{meta}{msg} = "No data object for method submitted. Abort!";
+            $json->{meta}{msg} = "No 'params' object{} for method-parameter submitted. Abort!";
         }
     }
     #########################################################################
