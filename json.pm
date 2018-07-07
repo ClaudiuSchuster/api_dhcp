@@ -31,7 +31,7 @@ sub print {
     
     ### Check if module for requested method is loaded, execute the method and fill the data{}-object
     if( defined $json_ref->{meta}{postdata}{method} ) {
-        my ($method) = grep { $json_ref->{meta}{postdata}{method} =~ /^($_|$_\/?\w*)$/ }  map /methods\/(\w+)\.pm/, keys %INC;
+        my ($method) = grep { $json_ref->{meta}{postdata}{method} =~ /^($_|$_\.?\w*)$/ }  map /methods\/(\w+)\.pm/, keys %INC;
         if( defined $method ) {
             {
                 no strict 'refs';
