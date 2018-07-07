@@ -132,109 +132,110 @@ sub print {
             ";
         }
     };  
-    my $printNewMethodTitle = sub { # 'Method', 'Description', 'Note'
-        print "
-            <h3>$_[1] <code class='method'>method=$_[0]</code> </h3>
-        ";
-        print "
-            <p>
-              <em class='wrapper'>
-                <span class='left'>
-                    Note:
-                </span>
-                <span class='right'>
-                    $_[2]
-                </span>
-              </em>
-            </p>
-        " if( defined $_[2] && $_[2] ); # Notes
-    };      
-    my $printParameterTable = sub { # ['Parameter', 'Type', 'Required', 'Default', 'Info'], [...], ...]
-        my @parameter = (    # default parameter
-            ['method', 'string', 'true', '', "API method to be executed"],
-        );
-        my @optParas = (    # default optional parameter
-            ['nodata', 'integer', 'false', 0, "Returns an empty response-object if set. View <a href='#modifyresponse'>Introduction</a> for description."],
-        );
-        if( scalar @_ ) {   # merge defaults with passed parameters
-            @parameter = (
-                @parameter,
-                ['json', 'object{}', 'true', '', "JSON-object{} of method parameters"],
-                @_,
-                @optParas
-            );
-        } else {
-            @parameter = (
-                @parameter,
-                @optParas
-            );
-        }
-        print "
-            <code>API Parameter:</code>
-            <table border='0'>
-              <tbody>
-                <tr>  
-                    <th><strong>Parameter</strong></th>
-                    <th><strong>Type</strong></th>
-                    <th><strong>Required</strong></th>
-                    <th><strong>Default</strong> </th>
-                    <th><strong>Info</strong></th>
-                </tr>
-        ";
-        print "
-                <tr>
-                    <td>$_->[0]</td>
-                    <td>$_->[1]</td>
-                    <td>$_->[2]</td>
-                    <td>$_->[3]</td>
-                    <td>$_->[4]</td>
-                </tr>
-        " for @parameter;
-        print "
-              </tbody>
-            </table>
-            <p></p>
-        ";
-    };
-    my $printRequestExample = sub { # 'example'
-        print "
-            <code>Request Example:</code>
-            <pre><code>".API::helpers::trim( $_[0] )."</code></pre>
-        ";
-    };
-    my $printReturnDataTable = sub { # ['Parameter', 'Type', 'Always returned', 'Description' ], [...], ...]
-        my @parameter = (    # default parameter
-            ['meta', 'object{}', 'yes', "Meta object, view <a href='#requests'>Responses</a> introduction for description."],
-            ['data', 'object{}', 'yes', "Data object, view <a href='#requests'>Responses</a> introduction for description."],
-        );
-        @parameter = ( @parameter, @_ ) if( scalar @_ );  # merge defaults with passed parameters
-        print "
-            <code>Return data:</code>
-            <table border='0'>
-              <tbody>
-                <tr>  
-                    <th><strong>Parameter</strong></th>
-                    <th><strong>Type</strong></th>
-                    <th><strong>Always returned</strong></th>
-                    <th><strong>Description</strong> </th>
-                </tr>
-        ";
-        print "
-                <tr>
-                    <td>$_->[0]</td>
-                    <td>$_->[1]</td>
-                    <td>$_->[2]</td>
-                    <td>$_->[3]</td>
-                </tr>
-        " for @parameter;
-        print "
-              </tbody>
-            </table>
-            </br>
-            <hr />
-        ";
-    };
     my $printMethod = sub {
+        my $printNewMethodTitle = sub { # 'Method', 'Description', 'Note'
+            print "
+                <h3>$_[1] <code class='method'>method=$_[0]</code> </h3>
+            ";
+            print "
+                <p>
+                  <em class='wrapper'>
+                    <span class='left'>
+                        Note:
+                    </span>
+                    <span class='right'>
+                        $_[2]
+                    </span>
+                  </em>
+                </p>
+            " if( defined $_[2] && $_[2] ); # Notes
+        };      
+        my $printParameterTable = sub { # ['Parameter', 'Type', 'Required', 'Default', 'Info'], [...], ...]
+            my @parameter = (    # default parameter
+                ['method', 'string', 'true', '', "API method to be executed"],
+            );
+            my @optParas = (    # default optional parameter
+                ['nodata', 'integer', 'false', 0, "Returns an empty response-object if set. View <a href='#modifyresponse'>Introduction</a> for description."],
+            );
+            if( scalar @_ ) {   # merge defaults with passed parameters
+                @parameter = (
+                    @parameter,
+                    ['json', 'object{}', 'true', '', "JSON-object{} of method parameters"],
+                    @_,
+                    @optParas
+                );
+            } else {
+                @parameter = (
+                    @parameter,
+                    @optParas
+                );
+            }
+            print "
+                <code>API Parameter:</code>
+                <table border='0'>
+                  <tbody>
+                    <tr>  
+                        <th><strong>Parameter</strong></th>
+                        <th><strong>Type</strong></th>
+                        <th><strong>Required</strong></th>
+                        <th><strong>Default</strong> </th>
+                        <th><strong>Info</strong></th>
+                    </tr>
+            ";
+            print "
+                    <tr>
+                        <td>$_->[0]</td>
+                        <td>$_->[1]</td>
+                        <td>$_->[2]</td>
+                        <td>$_->[3]</td>
+                        <td>$_->[4]</td>
+                    </tr>
+            " for @parameter;
+            print "
+                  </tbody>
+                </table>
+                <p></p>
+            ";
+        };
+        my $printRequestExample = sub { # 'example'
+            print "
+                <code>Request Example:</code>
+                <pre><code>".API::helpers::trim( $_[0] )."</code></pre>
+            ";
+        };
+        my $printReturnDataTable = sub { # ['Parameter', 'Type', 'Always returned', 'Description' ], [...], ...]
+            my @parameter = (    # default parameter
+                ['meta', 'object{}', 'yes', "Meta object, view <a href='#requests'>Responses</a> introduction for description."],
+                ['data', 'object{}', 'yes', "Data object, view <a href='#requests'>Responses</a> introduction for description."],
+            );
+            @parameter = ( @parameter, @_ ) if( scalar @_ );  # merge defaults with passed parameters
+            print "
+                <code>Return data:</code>
+                <table border='0'>
+                  <tbody>
+                    <tr>  
+                        <th><strong>Parameter</strong></th>
+                        <th><strong>Type</strong></th>
+                        <th><strong>Always returned</strong></th>
+                        <th><strong>Description</strong> </th>
+                    </tr>
+            ";
+            print "
+                    <tr>
+                        <td>$_->[0]</td>
+                        <td>$_->[1]</td>
+                        <td>$_->[2]</td>
+                        <td>$_->[3]</td>
+                    </tr>
+            " for @parameter;
+            print "
+                  </tbody>
+                </table>
+                </br>
+                <hr />
+            ";
+        };
+        
         $printNewMethodTitle->( $_[0]->{method}, $_[0]->{title}, $_[0]->{note} );
         $printParameterTable->( @{$_[0]->{parameterTable}} );
         $printRequestExample->( $_[0]->{requestExample} );
