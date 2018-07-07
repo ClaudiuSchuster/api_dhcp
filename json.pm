@@ -30,7 +30,7 @@ sub print {
     };
     
     ### Check if module for requested method is loaded, execute the method and fill the data{}-object
-    if( defined $json->{meta}{postdata}{method} ) {
+    if( $json->{meta}{postdata}{method} ) {
         my ($method) = grep { $json->{meta}{postdata}{method} =~ /^($_|$_\.?\w*)$/ }  map /methods\/(\w+)\.pm/, keys %INC;
         if( defined $method ) {
             {
