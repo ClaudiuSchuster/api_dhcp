@@ -682,7 +682,7 @@ sub init {
 	    my($param) = $meth . 'DATA' ;
 	    $self->add_parameter($param) ;
 	    push (@{$self->{param}{$param}},$query_string);
-	    # undef $query_string;
+	    undef $query_string;
     }
 # YL: End Change for XML handler 10/19/2001
 
