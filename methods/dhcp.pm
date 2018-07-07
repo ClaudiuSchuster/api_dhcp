@@ -14,8 +14,8 @@ sub run {
     my $dhcpdPath = '/usr/sbin/dhcpd';
     my $filename = '/etc/dhcp/dhcpd.conf';
     my $leasefile = '/var/lib/dhcp/dhcpd.leases';
-    $json->{meta}{method} = 'dhcp' if(defined $q->param('method') && $q->param('method') eq 'dhcp');
-    my $postdata = {};
+    $json->{meta}{method} = 'dhcp' if($json->{meta}{postdata}{method} eq 'dhcp');
+    my $postdata = $json->{meta}{postdata}{data} || undef;
     #########################################################################
     
     ###################  Parsing dhcpd.conf and leases  #####################
@@ -50,9 +50,9 @@ sub run {
     #########################################################################
 
     ########################  dhcp/restartservice  ##########################
-    if(defined $q->param('method') && $q->param('method') eq "dhcp/restartservice") {
+    if( $json->{meta}{postdata}{method} eq "dhcp.restartservice" ) {
         my $content = API::helpers::trim(`service isc-dhcp-server restart`);
-        $json->{'meta'}{'method'} = $q->param('method');
+        $json->{meta}{method} = $json->{meta}{postdata}{method};
         if( defined $content && $content eq "" ) {
             $json->{'meta'}{'msg'} = undef;
         } elsif ( defined $content && $content ne "" ) {
@@ -62,14 +62,9 @@ sub run {
         }
     }
     ########################  dhcp/addhost         ##########################
-    elsif(defined $q->param('method') && $q->param('method') eq "dhcp/addhost") {
-        $json->{meta}{method}   = $q->param('method');
-        $json->{meta}{json} = $q->param('json');
-        eval { $postdata = decode_json($q->param('json')); 1; } or do { 
-            $json->{meta}{rc}  = 400;
-            $json->{meta}{msg} = 'error.decode_json: '.$@;
-        };
-        if ($json->{meta}{rc} == 200) {
+    elsif( $json->{meta}{postdata}{method} eq "dhcp.addhost" ) {
+        $json->{meta}{method} = $json->{meta}{postdata}{method};
+        if ( ref($postdata) eq 'HASH' ) {
             unless( $postdata->{group} && $postdata->{name} && $postdata->{mac} ) {
                 $json->{meta}{rc}  = 400;
                 $json->{meta}{msg} = "Insufficient arguments submitted: 'group + name + mac' are needed!";
@@ -109,17 +104,15 @@ sub run {
                     }
                 }
             }
+        } else {
+            $json->{meta}{rc}  = 400;
+            $json->{meta}{msg} = "No data object for method submitted. Abort!";
         }
     }
     ########################  dhcp/removehost      ##########################
-    elsif(defined $q->param('method') && $q->param('method') eq "dhcp/removehost") {
-        $json->{meta}{method}   = $q->param('method');
-        $json->{meta}{json} = $q->param('json');
-        eval { $postdata = decode_json($q->param('json')); 1; } or do { 
-            $json->{meta}{rc}  = 400;
-            $json->{meta}{msg} = 'error.decode_json: '.$@;
-        };
-        if ($json->{meta}{rc} == 200) {
+    elsif( $json->{meta}{postdata}{method} eq "dhcp.removehost" ) {
+        $json->{meta}{method} = $json->{meta}{postdata}{method};
+        if ( ref($postdata) eq 'HASH' ) {
             unless( $postdata->{name} || $postdata->{mac} ) {
                 $json->{meta}{rc}  = 400;
                 $json->{meta}{msg} = "Insufficient arguments submitted: 'name' or 'mac' are needed!";
@@ -149,17 +142,15 @@ sub run {
                     }
                 }
             }
+        } else {
+            $json->{meta}{rc}  = 400;
+            $json->{meta}{msg} = "No data object for method submitted. Abort!";
         }
     }
     ########################  dhcp/alterhost        ##########################
-    elsif(defined $q->param('method') && $q->param('method') eq "dhcp/alterhost") {
-        $json->{meta}{method}   = $q->param('method');
-        $json->{meta}{json} = $q->param('json');
-        eval { $postdata = decode_json($q->param('json')); 1; } or do { 
-            $json->{meta}{rc}  = 400;
-            $json->{meta}{msg} = 'error.decode_json: '.$@;
-        };
-        if ($json->{meta}{rc} == 200) {
+    elsif( $json->{meta}{postdata}{method} eq "dhcp.alterhost" ) {
+        $json->{meta}{method} = $json->{meta}{postdata}{method};
+        if ( ref($postdata) eq 'HASH' ) {
             unless( ($postdata->{name} || $postdata->{mac}) && ($postdata->{group} || $postdata->{newname} || $postdata->{newmac}) ) {
                 $json->{meta}{rc}  = 400;
                 $json->{meta}{msg} = "Insufficient arguments submitted: ('name' or 'mac') and ('group' or 'newname' or 'newmac') are required!";
@@ -237,17 +228,15 @@ sub run {
                     }
                 }
             }
+        } else {
+            $json->{meta}{rc}  = 400;
+            $json->{meta}{msg} = "No data object for method submitted. Abort!";
         }
     }
     ########################  dhcp/addgroup        ##########################
-    elsif(defined $q->param('method') && $q->param('method') eq "dhcp/addgroup") {
-        $json->{meta}{method}   = $q->param('method');
-        $json->{meta}{json} = $q->param('json');
-        eval { $postdata = decode_json($q->param('json')); 1; } or do { 
-            $json->{meta}{rc}  = 400;
-            $json->{meta}{msg} = 'error.decode_json: '.$@;
-        };
-        if ($json->{meta}{rc} == 200) {
+    elsif( $json->{meta}{postdata}{method} eq "dhcp.addgroup" ) {
+        $json->{meta}{method} = $json->{meta}{postdata}{method};
+        if ( ref($postdata) eq 'HASH' ) {
             unless( $postdata->{group} && $postdata->{options} ) {
                 $json->{meta}{rc}  = 400;
                 $json->{meta}{msg} = "Insufficient arguments submitted: 'name + options' are needed! options = [] or ".'[{"name":"op","value":"a","quoted":1},{..},..]';
@@ -277,17 +266,15 @@ sub run {
                     }
                 }
             }
+        } else {
+            $json->{meta}{rc}  = 400;
+            $json->{meta}{msg} = "No data object for method submitted. Abort!";
         }
     }
     ########################  dhcp/removegroup     ##########################
-    elsif(defined $q->param('method') && $q->param('method') eq "dhcp/removegroup") {
-        $json->{meta}{method}   = $q->param('method');
-        $json->{meta}{json} = $q->param('json');
-        eval { $postdata = decode_json($q->param('json')); 1; } or do { 
-            $json->{meta}{rc}  = 400;
-            $json->{meta}{msg} = 'error.decode_json: '.$@;
-        };
-        if ($json->{meta}{rc} == 200) {
+    elsif( $json->{meta}{postdata}{method} eq "dhcp.removegroup" ) {
+        $json->{meta}{method} = $json->{meta}{postdata}{method};
+        if ( ref($postdata) eq 'HASH' ) {
             unless( $postdata->{group} ) {
                 $json->{meta}{rc}  = 400;
                 $json->{meta}{msg} = "Insufficient arguments submitted: 'group' are needed!";
@@ -308,17 +295,15 @@ sub run {
                     }
                 }
             }
+        } else {
+            $json->{meta}{rc}  = 400;
+            $json->{meta}{msg} = "No data object for method submitted. Abort!";
         }
     }
     ########################  dhcp/altergroup      ##########################
-    elsif(defined $q->param('method') && $q->param('method') eq "dhcp/altergroup") {
-        $json->{meta}{method}   = $q->param('method');
-        $json->{meta}{json} = $q->param('json');
-        eval { $postdata = decode_json($q->param('json')); 1; } or do { 
-            $json->{meta}{rc}  = 400;
-            $json->{meta}{msg} = 'error.decode_json: '.$@;
-        };
-        if ($json->{meta}{rc} == 200) {
+    elsif( $json->{meta}{postdata}{method} eq "dhcp.altergroup" ) {
+        $json->{meta}{method} = $json->{meta}{postdata}{method};
+        if ( ref($postdata) eq 'HASH' ) {
             unless( $postdata->{group} && ($postdata->{options} || $postdata->{name}) ) {
                 $json->{meta}{rc}  = 400;
                 $json->{meta}{msg} = "Insufficient arguments submitted: 'group' and ('name' or/and 'options') are required! options = ".'[{"name":"op","value":"a","quoted":1},{..},..]';
@@ -413,6 +398,9 @@ sub run {
                     }
                 }
             }
+        } else {
+            $json->{meta}{rc}  = 400;
+            $json->{meta}{msg} = "No data object for method submitted. Abort!";
         }
     }
     #########################################################################
