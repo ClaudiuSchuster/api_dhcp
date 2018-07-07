@@ -677,12 +677,12 @@ sub init {
 
 # YL: Begin Change for XML handler 10/19/2001
     if (!$is_xforms && ($meth eq 'POST' || $meth eq 'PUT')
-        && defined($ENV{'CONTENT_TYPE'}) && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded| && $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| 
+        # && defined($ENV{'CONTENT_TYPE'}) && $ENV{'CONTENT_TYPE'} !~ m|^application/x-www-form-urlencoded| && $ENV{'CONTENT_TYPE'} !~ m|^multipart/form-data| 
     ) {
 	    my($param) = $meth . 'DATA' ;
 	    $self->add_parameter($param) ;
 	    push (@{$self->{param}{$param}},$query_string);
-	    undef $query_string;
+	    # undef $query_string;
     }
 # YL: End Change for XML handler 10/19/2001
 
