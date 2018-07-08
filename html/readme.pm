@@ -25,6 +25,8 @@ sub print {
                       Goto:
                           <a style='margin-left:10px;' href='#dhcp'>DHCP</a>
                           <span  style='margin:0 10px 0 10px;'>-</span>
+                          <a href='#mine'>MINE</a>
+                          <span  style='margin:0 10px 0 10px;'>-</span>
                           <a href='#eth'>ETH</a>
                   </p>
                   <h4 id='requests'>
@@ -339,7 +341,7 @@ sub print {
     $printReadmeClass->('dhcp');
     {
 
-        my $returnObject = ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method=dhcp</a> for description"];
+        my $returnObject = ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method:dhcp</a> for description"];
         
         $printMethod->({
             method          => "dhcp",
@@ -413,7 +415,7 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"nodata":1,"method":"dhcp.restartservic
       "method" : "dhcp.restartservice"
    },
    "data" : {
-      "dhcp" : {}  // Contains (without nodata=1) the DHCP configuration and service uptime seconds, view <a href='#dhcp'>method=dhcp</a> for description.
+      "dhcp" : {}  // Contains (without nodata=1) the DHCP configuration and service uptime seconds, view <a href='#dhcp'>method:dhcp</a> for description.
    }
 }
             ~,
@@ -539,10 +541,27 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.altergroup","params":{"g
 
     }
     
+    $printReadmeClass->('mine');
+    {
+
+        # my $returnObject = ['data:mine', 'object{}', 'yes', "Contains Mine Data, view <a href='#eth'>method: mine</a> for description"];
+
+        # $printMethod->({
+            # method          => "mine",
+            # title           => "Get Mine data",
+            # note            => "What a cool Note!",
+            # parameterTable  => [],
+            # requestExample  => qq~Do something cool~,
+            # returnDataTable => [ $returnObject ],
+        # });
+
+        1;
+    }
+    
     $printReadmeClass->('eth');
     {
 
-        # my $returnObject = ['data:eth', 'object{}', 'yes', "Contains ETH Data, view <a href='#eth'>method=eth</a> for description"];
+        # my $returnObject = ['data:eth', 'object{}', 'yes', "Contains ETH Data, view <a href='#eth'>method: eth</a> for description"];
 
         # $printMethod->({
             # method          => "eth",
