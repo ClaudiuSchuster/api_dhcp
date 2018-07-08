@@ -7,10 +7,10 @@ sub print {
     my $cgi = shift;
     ### Define API individual stuff
     my $title_appent = ' - pxe.mine.io';
-    my $classJumplist = ['dhcp','mine','eth'];
+    my $classJumplist = ['dhcp','mine','eth'];  # || []
     
-    my $printReadmeClass = sub { # 'class' 
-        my $classAnchors;
+    my $printReadmeClass = sub {
+        my $classAnchors = '';
         if( scalar @$classJumplist ) {
             $classAnchors = "<p>Goto: <a style='margin-left:10px;' href='#class_";
             for ( @$classJumplist ) {
@@ -19,7 +19,7 @@ sub print {
                     $classAnchors .= $_."'>".uc $_."</a>";
                 } else {
                     $classAnchors .= "
-                        <span  style='margin:0 10px 0 10px;'>-</span>
+                        <span style='margin:0 10px 0 10px;'>-</span>
                         <a href='#class_".$_."'>".uc $_."</a>
                     ";
                 }
@@ -372,8 +372,8 @@ sub print {
             table tr:last-child { border-bottom: 1px solid #ccc; }
         "}
     );
-    
     $printReadmeClass->('introduction');
+    
     
     $printReadmeClass->('dhcp');
     $printMethodList->(['dhcp','dhcp.restartservice','dhcp.addhost','dhcp.removehost','dhcp.alterhost','dhcp.addgroup','dhcp.removegroup','dhcp.altergroup']);
@@ -615,8 +615,8 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.altergroup","params":{"g
         1;
     }
     
-    $printReadmeClass->('endReadme');
     
+    $printReadmeClass->('endReadme');
     print $cgi->end_html;
 }
 
