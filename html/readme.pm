@@ -11,13 +11,12 @@ sub print {
     API::html::readme::print::ReadmeClass('introduction',$cgi,' - pxe.mine.io',[]);  # ['dhcp','mine','eth']
     
     
-    API::html::readme::print::ReadmeClass('dhcp');
-    API::html::readme::print::MethodList(['dhcp','dhcp.restartservice','dhcp.addhost','dhcp.removehost','dhcp.alterhost','dhcp.addgroup','dhcp.removegroup','dhcp.altergroup']);
-    {
-        
-        my $returnObject = ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method:dhcp</a> for description"];
-        
-        API::html::readme::print::Method({
+    API::html::readme::print::ReadmeClass([
+        {
+            readmeClass  => 'dhcp',
+            returnObject => ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method:dhcp</a> for description"]
+        },
+        {
             method          => "dhcp",
             title           => "Get DHCP configuration data",
             note            => "The described return data will be returned with every <code>dhcp.*</code> API-Method.</br>'null' value of a return parameter corresponds to a not defined value on server.",
@@ -66,9 +65,8 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp"}'
                 ['data:dhcp:leases:*:host:group', 'string', 'yes', "Groupname from associated host."],
                 ['data:dhcp:leases:*:host:vivso', 'string', 'yes || null', "Contains the origin-groupname if associated host was moved to a <code>(.*-dev|winbios)</code> named group."],
             ],
-        });
-        
-        API::html::readme::print::Method({
+        },
+        {
             method          => "dhcp.restartservice",
             title           => "Restart 'isc-dhcp-server' serivce",
             note            => "",
@@ -93,10 +91,9 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"nodata":1,"method":"dhcp.restartservic
    }                  View <a href='#dhcp'>method:dhcp</a> for detailed description. */
 }
             ~,
-            returnDataTable => [ $returnObject ],
-        });
-
-        API::html::readme::print::Method({
+            returnDataTable => [ 'returnObject' ],
+        },
+        {
             method          => "dhcp.addhost",
             title           => "Add a host",
             note            => "",
@@ -108,10 +105,9 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"nodata":1,"method":"dhcp.restartservic
             requestExample  => qq~
 curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.addhost","params":{"group":"monsterGroup","name":"powerRig","mac":"11:22:33:44:55:66"}}'
             ~,
-            returnDataTable => [ $returnObject ],
-        });
-
-        API::html::readme::print::Method({
+            returnDataTable => [ 'returnObject' ],
+        },
+        {
             method          => "dhcp.removehost",
             title           => "Remove a host",
             note            => "",
@@ -123,10 +119,9 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.addhost","params":{"grou
 curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.removehost","params":{"name":"powerRig"}}'
 curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.removehost","params":{"mac":"11:22:33:44:55:66"}}'
             ~,
-            returnDataTable => [ $returnObject ],
-        });
-
-        API::html::readme::print::Method({
+            returnDataTable => [ 'returnObject' ],
+        },
+        {
             method          => "dhcp.alterhost",
             title           => "Alter a host (<code>Change</code> group <code>and/or</code> name <code>and/or</code> mac-address)",
             note            => "If the host will be moved to a group with name <code>(.*-dev|winbios)</code> the host-parameter <code>'vivso'</code> will be set with the origin-group-name to move the host easy back to its original-group.",
@@ -160,10 +155,9 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"ma
 curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"name":"powerRig","newname":"ultraMiner","newmac":"66:55:44:33:22:11"}}'
 curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"mac":"11:22:33:44:55:66","newname":"ultraMiner","newmac":"66:55:44:33:22:11"}}'
             ~,
-            returnDataTable => [ $returnObject ],
-        });
-
-        API::html::readme::print::Method({
+            returnDataTable => [ 'returnObject' ],
+        },
+        {
             method          => "dhcp.addgroup",
             title           => "Add a group",
             note            => "",
@@ -175,10 +169,9 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"ma
 curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.addgroup","params":{"group":"monsterGroup","options":[]}}'
 curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.addgroup","params":{"group":"monsterGroup","options":[{"name":"foo","value":"bar","quoted":1}]}}'
             ~,
-            returnDataTable => [ $returnObject ],
-        });
-
-        API::html::readme::print::Method({
+            returnDataTable => [ 'returnObject' ],
+        },
+        {
             method          => "dhcp.removegroup",
             title           => "Remove a group",
             note            => "The group must be empty (move/remove hosts first).",
@@ -188,10 +181,9 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.addgroup","params":{"gro
             requestExample  => qq~
 curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.removegroup","params":{"group":"monsterGroup"}}'
             ~,
-            returnDataTable => [ $returnObject ],
-        });
-
-        API::html::readme::print::Method({
+            returnDataTable => [ 'returnObject' ],
+        },
+        {
             method          => "dhcp.altergroup",
             title           => "Alter a group (<code>Change</code> name <code>and/or</code> options)",
             note            => "",
@@ -210,46 +202,35 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.altergroup","params":{"g
 # Replace the options and keep the current name.
 curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.altergroup","params":{"group":"megaGroup","options":[{"name":"foo","value":"bar","quoted":1}]}}'
             ~,
-            returnDataTable => [ $returnObject ],
-        });
-
-    }
+            returnDataTable => [ 'returnObject' ],
+        }
+    ]);
     
-    # API::html::readme::print::ReadmeClass('mine');
-    # API::html::readme::print::MethodList([]);
-    {
-
-        # my $returnObject = ['data:mine', 'object{}', 'yes', "Contains Mine Data, view <a href='#eth'>method: mine</a> for description"];
-
-        # API::html::readme::print::Method({
+    
+    # API::html::readme::print::ReadmeClass([
+        # {
+            # readmeClass  => 'mine',
+            # returnObject => ['data:mine', 'object{}', 'yes', "Contains Mine Data, view <a href='#eth'>method: mine</a> for description"]
+        # },
+        # {
             # method          => "mine",
             # title           => "Get Mine data",
             # note            => "What a cool Note!",
             # parameterTable  => [],
             # requestExample  => qq~Do something cool~,
-            # returnDataTable => [ $returnObject ],
-        # });
-
-        1;
-    }
-    
-    # API::html::readme::print::ReadmeClass('eth');
-    # API::html::readme::print::MethodList([]);
-    {
-
-        # my $returnObject = ['data:eth', 'object{}', 'yes', "Contains ETH Data, view <a href='#eth'>method: eth</a> for description"];
-
-        # API::html::readme::print::Method({
-            # method          => "eth",
-            # title           => "Get ETH data",
+            # returnDataTable => [ 'returnObject' ],
+        # },
+        # {
+            # method          => "mine.method",
+            # title           => "Do mine.method",
             # note            => "What a cool Note!",
             # parameterTable  => [],
-            # requestExample  => qq~Do something cool~,
-            # returnDataTable => [ $returnObject ],
-        # });
-
-        1;
-    }
+            # requestExample  => qq~
+# curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"mine.method"}'
+            # ~,
+            # returnDataTable => [ 'returnObject' ],
+        # }
+    # ]);
     
     
     API::html::readme::print::ReadmeClass('endReadme',$cgi);
