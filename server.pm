@@ -14,7 +14,7 @@ use html::dhcp;
 use html::readme;
 
 
-### Load our CGI module and initialize it
+### Overwrite cgi_init function of HTTP::Server::Simple::CGI to load our own CGI module and initialize it
 sub cgi_init {
     my $self = shift;
     if (@_) {
