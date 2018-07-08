@@ -118,6 +118,7 @@ sub print {
             ";
         } elsif ( $_[0] eq 'endReadme' ) {
             print "
+                </br>
               </div>
               <hr />
             ";
@@ -567,6 +568,7 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.altergroup","params":{"g
     }
     
     $printReadmeClass->('mine');
+    $printMethodList->([]);
     {
 
         # my $returnObject = ['data:mine', 'object{}', 'yes', "Contains Mine Data, view <a href='#eth'>method: mine</a> for description"];
@@ -584,6 +586,7 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.altergroup","params":{"g
     }
     
     $printReadmeClass->('eth');
+    $printMethodList->([]);
     {
 
         # my $returnObject = ['data:eth', 'object{}', 'yes', "Contains ETH Data, view <a href='#eth'>method: eth</a> for description"];
