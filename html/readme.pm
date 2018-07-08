@@ -67,13 +67,13 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp"}'
             ],
         },
         {
-            method          => "dhcp.restartservice",
+            method          => "dhcp.service.restart",
             title           => "Restart 'isc-dhcp-server' serivce",
             note            => "",
             parameterTable  => [],
             requestExample  => qq~
 // Request
-curl http://$ENV{HTTP_HOST} -X POST -d '{"nodata":1,"method":"dhcp.restartservice"}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"nodata":1,"method":"dhcp.service.restart"}'
 
 // Result
 {
@@ -81,10 +81,10 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"nodata":1,"method":"dhcp.restartservic
       "msg" : null,
       "rc" : 200,
       "postdata" : {
-         "method" : "dhcp.restartservice",
+         "method" : "dhcp.service.restart",
          "nodata" : 1
       },
-      "method" : "dhcp.restartservice"
+      "method" : "dhcp.service.restart"
    },
    "data" : {
       "dhcp" : {}  /* Contains (without nodata=1) the isc-dhcp-server service status, uptime and configuration.
@@ -94,7 +94,7 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"nodata":1,"method":"dhcp.restartservic
             returnDataTable => [ 'returnObject' ],
         },
         {
-            method          => "dhcp.addhost",
+            method          => "dhcp.host.add",
             title           => "Add a host",
             note            => "",
             parameterTable  => [
@@ -103,12 +103,12 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"nodata":1,"method":"dhcp.restartservic
                 ['params:mac', 'string', 'true', '', "'mac'-address of the host"],
             ],
             requestExample  => qq~
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.addhost","params":{"group":"monsterGroup","name":"powerRig","mac":"11:22:33:44:55:66"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.add","params":{"group":"monsterGroup","name":"powerRig","mac":"11:22:33:44:55:66"}}'
             ~,
             returnDataTable => [ 'returnObject' ],
         },
         {
-            method          => "dhcp.removehost",
+            method          => "dhcp.host.remove",
             title           => "Remove a host",
             note            => "",
             parameterTable  => [
@@ -116,13 +116,13 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.addhost","params":{"grou
                 ['params:mac', 'string', 'or name', '', "'mac'-address of the host"],
             ],
             requestExample  => qq~
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.removehost","params":{"name":"powerRig"}}'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.removehost","params":{"mac":"11:22:33:44:55:66"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.remove","params":{"name":"powerRig"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.remove","params":{"mac":"11:22:33:44:55:66"}}'
             ~,
             returnDataTable => [ 'returnObject' ],
         },
         {
-            method          => "dhcp.alterhost",
+            method          => "dhcp.host.alter",
             title           => "Alter a host (<code>Change</code> group <code>and/or</code> name <code>and/or</code> mac-address)",
             note            => "If the host will be moved to a group with name <code>(.*-dev|winbios)</code> the host-parameter <code>'vivso'</code> will be set with the origin-group-name to move the host easy back to its original-group.",
             parameterTable  => [
@@ -134,31 +134,31 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.removehost","params":{"m
             ],
             requestExample  => qq~
 # Move host to another 'group' (select by 'name' or 'mac'), keep current 'name' and 'mac'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"name":"powerRig","group":"megaGroup"}}'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"mac":"11:22:33:44:55:66","group":"megaGroup"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"name":"powerRig","group":"megaGroup"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"mac":"11:22:33:44:55:66","group":"megaGroup"}}'
 
 # Rename host (select by 'name' or 'mac'), keep current 'group' and 'mac'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"name":"powerRig","newname":"ultraMiner"}}'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"mac":"11:22:33:44:55:66","newname":"ultraMiner"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"name":"powerRig","newname":"ultraMiner"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"mac":"11:22:33:44:55:66","newname":"ultraMiner"}}'
 
 # Alter MAC-Address of host (select by 'name' or 'mac'), keep current 'group' and 'name'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"name":"powerRig","newmac":"66:55:44:33:22:11"}}'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"mac":"11:22:33:44:55:66","newmac":"66:55:44:33:22:11"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"name":"powerRig","newmac":"66:55:44:33:22:11"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"mac":"11:22:33:44:55:66","newmac":"66:55:44:33:22:11"}}'
 
 # Alter combination of 'name', 'mac' and 'group' together (select by 'name' or 'mac').
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"name":"powerRig","group":"megaGroup","newname":"ultraMiner","newmac":"66:55:44:33:22:11"}}'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"mac":"11:22:33:44:55:66","group":"megaGroup","newname":"ultraMiner","newmac":"66:55:44:33:22:11"}}'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"name":"powerRig","group":"megaGroup","newname":"ultraMiner"}}'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"mac":"11:22:33:44:55:66","group":"megaGroup","newname":"ultraMiner"}}'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"name":"powerRig","group":"megaGroup","newmac":"66:55:44:33:22:11"}}'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"mac":"11:22:33:44:55:66","group":"megaGroup","newmac":"66:55:44:33:22:11"}}'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"name":"powerRig","newname":"ultraMiner","newmac":"66:55:44:33:22:11"}}'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"mac":"11:22:33:44:55:66","newname":"ultraMiner","newmac":"66:55:44:33:22:11"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"name":"powerRig","group":"megaGroup","newname":"ultraMiner","newmac":"66:55:44:33:22:11"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"mac":"11:22:33:44:55:66","group":"megaGroup","newname":"ultraMiner","newmac":"66:55:44:33:22:11"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"name":"powerRig","group":"megaGroup","newname":"ultraMiner"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"mac":"11:22:33:44:55:66","group":"megaGroup","newname":"ultraMiner"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"name":"powerRig","group":"megaGroup","newmac":"66:55:44:33:22:11"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"mac":"11:22:33:44:55:66","group":"megaGroup","newmac":"66:55:44:33:22:11"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"name":"powerRig","newname":"ultraMiner","newmac":"66:55:44:33:22:11"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.host.alter","params":{"mac":"11:22:33:44:55:66","newname":"ultraMiner","newmac":"66:55:44:33:22:11"}}'
             ~,
             returnDataTable => [ 'returnObject' ],
         },
         {
-            method          => "dhcp.addgroup",
+            method          => "dhcp.group.add",
             title           => "Add a group",
             note            => "",
             parameterTable  => [
@@ -166,25 +166,25 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.alterhost","params":{"ma
                 ['params:options', 'array[]', 'true', '', qq~array[] of config 'option'-objects{} for the group</br>[{"name":"op","value":"a","quoted":1},{..},..]~],
             ],
             requestExample  => qq~
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.addgroup","params":{"group":"monsterGroup","options":[]}}'
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.addgroup","params":{"group":"monsterGroup","options":[{"name":"foo","value":"bar","quoted":1}]}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.group.add","params":{"group":"monsterGroup","options":[]}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.group.add","params":{"group":"monsterGroup","options":[{"name":"foo","value":"bar","quoted":1}]}}'
             ~,
             returnDataTable => [ 'returnObject' ],
         },
         {
-            method          => "dhcp.removegroup",
+            method          => "dhcp.group.remove",
             title           => "Remove a group",
             note            => "The group must be empty (move/remove hosts first).",
             parameterTable  => [
                 ['params:group', 'string', 'true', '', "name of the 'group' which will be removed"],
             ],
             requestExample  => qq~
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.removegroup","params":{"group":"monsterGroup"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.group.remove","params":{"group":"monsterGroup"}}'
             ~,
             returnDataTable => [ 'returnObject' ],
         },
         {
-            method          => "dhcp.altergroup",
+            method          => "dhcp.group.alter",
             title           => "Alter a group (<code>Change</code> name <code>and/or</code> options)",
             note            => "",
             parameterTable  => [
@@ -194,13 +194,13 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.removegroup","params":{"
             ],
             requestExample  => qq~
 # Rename group and keep current options.
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.altergroup","params":{"group":"megaGroup","name":"monsterGroup"}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.group.alter","params":{"group":"megaGroup","name":"monsterGroup"}}'
 
 # Rename group and set new options. (In example all currently existing options will be deleted)
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.altergroup","params":{"group":"megaGroup","name":"monsterGroup","options":[]}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.group.alter","params":{"group":"megaGroup","name":"monsterGroup","options":[]}}'
 
 # Replace the options and keep the current name.
-curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.altergroup","params":{"group":"megaGroup","options":[{"name":"foo","value":"bar","quoted":1}]}}'
+curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.group.alter","params":{"group":"megaGroup","options":[{"name":"foo","value":"bar","quoted":1}]}}'
             ~,
             returnDataTable => [ 'returnObject' ],
         }

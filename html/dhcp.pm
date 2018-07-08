@@ -32,7 +32,7 @@ sub print {
     print qq~<form><input style="margin-right: 20px; width: 220px; background-color: lightblue; color: darkblue; font-weight: bold; float: left;" 
                         type="button" value="-- Get JSON --" onclick="window.location.href='http://$ENV{HTTP_HOST}?method=dhcp'" /></form> ~;
     print qq~<form><input style="width: 220px; background-color: #F78181; color: #0B2F3A; font-weight: bold; float: left;" 
-                        type="button" value="! Restart ISC-DHCP-SERVER !" onclick="window.location.href='http://$ENV{HTTP_HOST}$sitePath?method=dhcp.restartservice'" /></form> ~;
+                        type="button" value="! Restart ISC-DHCP-SERVER !" onclick="window.location.href='http://$ENV{HTTP_HOST}$sitePath?method=dhcp.service.restart'" /></form> ~;
     print "</div><br/><br/>";
     for my $groupName (sort keys %{$dhcpd->{groups}}) {
         if ( $groupName =~ /winbios|.*-dev/ && keys %{$dhcpd->{groups}{$groupName}{hosts}} > 0 && ( !grep{$_ =~ /pxe.test.*/i} keys %{$dhcpd->{groups}{$groupName}{hosts}} or keys %{$dhcpd->{groups}{$groupName}{hosts}} > 1 ) ) {
@@ -50,7 +50,7 @@ sub print {
                         print qq~
                         <span style='float:left; margin-left: 5px; overflow: hidden;'>
                         <form method="post" id="move_$hostName$inGroupName">
-                            <input type="hidden" name="method" value="dhcp.alterhost">
+                            <input type="hidden" name="method" value="dhcp.host.alter">
                             <textarea name="json" style="display:none;">
                         ~;
                         print encode_json( {group => $inGroupName, name => $hostName} );
@@ -65,7 +65,7 @@ sub print {
                     print qq~
                     <span style='float:left; margin-left: 5px; overflow: hidden;'>
                     <form method="post" id="move_winbios_$hostName">
-                        <input type="hidden" name="method" value="dhcp.alterhost">
+                        <input type="hidden" name="method" value="dhcp.host.alter">
                         <textarea name="json" style="display:none;">
                     ~;
                     print encode_json( {group => 'winbios', name => $hostName} );
@@ -79,7 +79,7 @@ sub print {
                     print qq~
                     <span style='float:left; margin-left: 5px; overflow: hidden;'>
                     <form method="post" id="move_nvidia-dev_$hostName">
-                        <input type="hidden" name="method" value="dhcp.alterhost">
+                        <input type="hidden" name="method" value="dhcp.host.alter">
                         <textarea name="json" style="display:none;">
                     ~;
                     print encode_json( {group => 'nvidia-dev', name => $hostName} );
@@ -93,7 +93,7 @@ sub print {
                     print qq~
                     <span style='float:left; margin-left: 5px; overflow: hidden;'>
                     <form method="post" id="move_amd-dev_$hostName">
-                        <input type="hidden" name="method" value="dhcp.alterhost">
+                        <input type="hidden" name="method" value="dhcp.host.alter">
                         <textarea name="json" style="display:none;">
                     ~;
                     print encode_json( {group => 'amd-dev', name => $hostName} );
@@ -107,7 +107,7 @@ sub print {
                 print qq~
                 <span style='float:left; margin-left: 5px; overflow: hidden;'>
                 <form method="post" id="move_vivso_$hostName">
-                    <input type="hidden" name="method" value="dhcp.alterhost">
+                    <input type="hidden" name="method" value="dhcp.host.alter">
                     <textarea name="json" style="display:none;">
                 ~;
                 print encode_json( {group => $dhcpd->{groups}{$groupName}{hosts}{$hostName}{vivso}, name => $hostName} );

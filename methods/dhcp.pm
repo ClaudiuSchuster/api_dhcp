@@ -49,8 +49,8 @@ sub run {
     };
     #########################################################################
 
-    ########################  dhcp/restartservice  ##########################
-    if( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.restartservice" ) {
+    ########################  dhcp.service.restart  ##########################
+    if( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.service.restart" ) {
         my $content = API::helpers::trim(`service isc-dhcp-server restart 2>&1`);
         $json->{meta}{method} = $json->{meta}{postdata}{method};
         if( defined $content && $content eq "" ) {
@@ -61,8 +61,8 @@ sub run {
             return 0;
         }
     }
-    ########################  dhcp/addhost         ##########################
-    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.addhost" ) {
+    ########################  dhcp.host.add         ##########################
+    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.host.add" ) {
         $json->{meta}{method} = $json->{meta}{postdata}{method};
         if ( ref($params) eq 'HASH' ) {
             unless( $params->{group} && $params->{name} && $params->{mac} ) {
@@ -109,8 +109,8 @@ sub run {
             $json->{meta}{msg} = "No 'params' object{} for method-parameter submitted. Abort!";
         }
     }
-    ########################  dhcp/removehost      ##########################
-    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.removehost" ) {
+    ########################  dhcp.host.remove      ##########################
+    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.host.remove" ) {
         $json->{meta}{method} = $json->{meta}{postdata}{method};
         if ( ref($params) eq 'HASH' ) {
             unless( $params->{name} || $params->{mac} ) {
@@ -147,8 +147,8 @@ sub run {
             $json->{meta}{msg} = "No 'params' object{} for method-parameter submitted. Abort!";
         }
     }
-    ########################  dhcp/alterhost        ##########################
-    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.alterhost" ) {
+    ########################  dhcp.host.alter        ##########################
+    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.host.alter" ) {
         $json->{meta}{method} = $json->{meta}{postdata}{method};
         if ( ref($params) eq 'HASH' ) {
             unless( ($params->{name} || $params->{mac}) && ($params->{group} || $params->{newname} || $params->{newmac}) ) {
@@ -233,8 +233,8 @@ sub run {
             $json->{meta}{msg} = "No 'params' object{} for method-parameter submitted. Abort!";
         }
     }
-    ########################  dhcp/addgroup        ##########################
-    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.addgroup" ) {
+    ########################  dhcp.group.add        ##########################
+    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.group.add" ) {
         $json->{meta}{method} = $json->{meta}{postdata}{method};
         if ( ref($params) eq 'HASH' ) {
             unless( $params->{group} && $params->{options} ) {
@@ -271,8 +271,8 @@ sub run {
             $json->{meta}{msg} = "No 'params' object{} for method-parameter submitted. Abort!";
         }
     }
-    ########################  dhcp/removegroup     ##########################
-    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.removegroup" ) {
+    ########################  dhcp.group.remove     ##########################
+    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.group.remove" ) {
         $json->{meta}{method} = $json->{meta}{postdata}{method};
         if ( ref($params) eq 'HASH' ) {
             unless( $params->{group} ) {
@@ -300,8 +300,8 @@ sub run {
             $json->{meta}{msg} = "No 'params' object{} for method-parameter submitted. Abort!";
         }
     }
-    ########################  dhcp/altergroup      ##########################
-    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.altergroup" ) {
+    ########################  dhcp.group.alter      ##########################
+    elsif( defined $json->{meta}{postdata}{method} && $json->{meta}{postdata}{method} eq "dhcp.group.alter" ) {
         $json->{meta}{method} = $json->{meta}{postdata}{method};
         if ( ref($params) eq 'HASH' ) {
             unless( $params->{group} && ($params->{options} || $params->{name}) ) {
