@@ -7,7 +7,8 @@ sub print {
     my $cgi = shift;
     ### Define API individual stuff
     my $title_appent = ' - pxe.mine.io';
-    my $classJumplist = ['dhcp','mine','eth'];  # || []
+    # my $classJumplist = ['dhcp','mine','eth'];  # || []
+    my $classJumplist = [];
     
     my $printReadmeClass = sub {
         my $classAnchors = '';
@@ -579,8 +580,8 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.altergroup","params":{"g
 
     }
     
-    $printReadmeClass->('mine');
-    $printMethodList->([]);
+    # $printReadmeClass->('mine');
+    # $printMethodList->([]);
     {
 
         # my $returnObject = ['data:mine', 'object{}', 'yes', "Contains Mine Data, view <a href='#eth'>method: mine</a> for description"];
@@ -597,8 +598,8 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"method":"dhcp.altergroup","params":{"g
         1;
     }
     
-    $printReadmeClass->('eth');
-    $printMethodList->([]);
+    # $printReadmeClass->('eth');
+    # $printMethodList->([]);
     {
 
         # my $returnObject = ['data:eth', 'object{}', 'yes', "Contains ETH Data, view <a href='#eth'>method: eth</a> for description"];
