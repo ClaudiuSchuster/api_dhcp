@@ -21,12 +21,8 @@ sub print {
         },
         data => {}
     };
-    eval { $json->{meta}{postdata} = decode_json( $cgi->param('POSTDATA') || "{}" ); 1; } or do { 
-        $json->{meta}{rc}  = 400;
-        $json->{meta}{msg} = 'error.decode_json: '.$@;
-    };
-    my $method_dhcp = API::methods::dhcp::run($cgi,$json);
-        die  "Error! Try JSON API for detailed error.\n" unless $method_dhcp;
+    eval { $json->{meta}{postdata} = decode_json( $cgi->param('POSTDATA') || "{}" ); 1; } or die 'error.decode_json: '.$@;
+    my $method_dhcp = API::methods::dhcp::run($cgi,$json) || die "Error executing method! Try JSON API for detailed error.\n";
         
     my $dhcpd = $method_dhcp->{data};
     my $generateDhcpdConf_sub = $method_dhcp->{generateDhcpdConf_sub};
