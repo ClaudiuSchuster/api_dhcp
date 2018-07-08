@@ -35,7 +35,7 @@ sub print {
                   <p>
                       All API request must be sent as POST requests with a single JSON encoded parameter/data-Object{} to the Service-URL.
                   </p>
-                  <h4>
+                  <h4 id='responses'>
                       Responses
                   </h4>
                   <p>
@@ -100,13 +100,13 @@ sub print {
                         </tr>
                     </tbody></table>
                   </p>
-                  <h4 id='modifyresponse'>
+                  <h4>
                       Check for successful execution
                   </h4>
                   <p>
                       If returned meta->{method} equals to your requested API-Method and meta->{rc} == 200 the requested API call should be successful.
                   </p>
-                  <h4>
+                  <h4 id='modifyresponse'>
                       Modifying responses with query parameters
                   </h4>
                   <p>
@@ -215,8 +215,8 @@ sub print {
         };
         my $printReturnDataTable = sub { # ['Parameter', 'Type', 'Always returned', 'Description' ], [...], ...]
             my @parameter = (    # default parameter
-                ['meta', 'object{}', 'yes', "Meta object, view <a href='#requests'>Responses</a> introduction for description."],
-                ['data', 'object{}', 'yes', "Data object, view <a href='#requests'>Responses</a> introduction for description."],
+                ['meta', 'object{}', 'yes', "Meta object, view <a href='#responses'>Responses</a> introduction for description."],
+                ['data', 'object{}', 'yes', "Data object, view <a href='#responses'>Responses</a> introduction for description."],
             );
             @parameter = ( @parameter, @_ ) if( scalar @_ );  # merge defaults with passed parameters
             print "
