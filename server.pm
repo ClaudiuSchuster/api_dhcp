@@ -18,7 +18,7 @@ use html::readme;
 sub cgi_init {
     my $self = shift;
     $self->{cgi_init} = shift if(@_);
-    return $self->{cgi_init} || sub { require modules::CGI; CGI::initialize_globals()};
+    return $self->{cgi_init} || sub { require modules::CGI; CGI::initialize_globals(); };
 }
 
 ### Serve the requests... (Generate JSON, or check if we have a html module loaded for this URI and serve it :)
