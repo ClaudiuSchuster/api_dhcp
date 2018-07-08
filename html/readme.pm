@@ -424,8 +424,8 @@ curl http://$ENV{HTTP_HOST} -X POST -d '{"nodata":1,"method":"dhcp.restartservic
       "method" : "dhcp.restartservice"
    },
    "data" : {
-      "dhcp" : {}  // Contains (without nodata=1) the DHCP configuration and service uptime seconds, view <a href='#dhcp'>method:dhcp</a> for description.
-   }
+      "dhcp" : {}  /* Contains (without nodata=1) the isc-dhcp-server service status, uptime and configuration.
+   }                  View <a href='#dhcp'>method:dhcp</a> for detailed description. */
 }
             ~,
             returnDataTable => [ $returnObject ],
