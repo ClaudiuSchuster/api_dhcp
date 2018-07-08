@@ -201,7 +201,7 @@ sub print {
         my $printRequestExample = sub { # 'example'
             print "
                 <code>Request Example:</code>
-                <pre><code>".API::helpers::trim( $_[0] )."</code></pre>
+                <div class='requestExample'><pre><code>".API::helpers::trim( $_[0] )."</code></pre></div>
             ";
         };
         my $printReturnDataTable = sub { # ['Parameter', 'Type', 'Always returned', 'Description' ], [...], ...]
@@ -308,11 +308,19 @@ sub print {
                 height: 0px;
                 background-color: #fff;
             }
-            pre {
+            div.requestExample {
+                overflow: auto;
+                margin: 0;
+                padding: 0;
+            }
+            div.requestExample pre {
                 background: #eee;
                 padding: 8px;
                 border-left: 3px solid #ccc;
+                border-right: 3px solid #ccc;
                 margin-top: 0px;
+                box-sizing: border-box;
+                display: inline-block;
             }
             table {
                 border-collapse: collapse;
