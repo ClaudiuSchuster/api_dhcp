@@ -17,11 +17,8 @@ use html::readme;
 ### Overwrite cgi_init function of HTTP::Server::Simple::CGI to load our own CGI module and initialize it
 sub cgi_init {
     my $self = shift;
-    if (@_) {
-        $self->{cgi_init} = shift;
-    }
+    $self->{cgi_init} = shift if(@_);
     return $self->{cgi_init} || sub { require modules::CGI; CGI::initialize_globals()};
-    
 }
 
 ### Serve the requests... (Generate JSON, or check if we have a html module loaded for this URI and serve it :)
