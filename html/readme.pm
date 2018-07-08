@@ -128,15 +128,19 @@ sub print {
               <hr />
               </br>
               <h2 id='class_$_[0]'>".(uc $_[0])." <code class='method'>method: $_[0] || $_[0].*</code></h2>
-              <div class='indented'>
-                <hr />
             ";
         }
     };  
     my $printMethodList = sub {
-        print "<ul>";
+        print "
+            <ul>
+        ";
         print "<li><a href='#$_'>$_</a></li>" for ( @{$_[0]} );
-        print "</ul>";
+        print "
+            </ul>
+              <div class='indented'>
+                <hr />
+            ";
     };
     my $printMethod = sub {
         my $printNewMethodTitle = sub { # 'Method', 'Description', 'Note'
@@ -264,8 +268,8 @@ sub print {
             :target:before {
                 content: '';
                 display: block;
-                height: 54px; /* fixed header height*/
-                margin: -54px 0 0; /* negative fixed header height */
+                height: 56px; /* fixed header height*/
+                margin: -56px 0 0; /* negative fixed header height */
             }
             h1 {
               position: fixed;
@@ -359,8 +363,8 @@ sub print {
     $printReadmeClass->('introduction');
     
     $printReadmeClass->('dhcp');
+    $printMethodList->(['dhcp','dhcp.restartservice','dhcp.addhost','dhcp.removehost','dhcp.alterhost','dhcp.addgroup','dhcp.removegroup','dhcp.altergroup']);
     {
-        $printMethodList->(['dhcp','dhcp.restartservice','dhcp.addhost','dhcp.removehost','dhcp.alterhost','dhcp.addgroup','dhcp.removegroup','dhcp.altergroup']);
         
         my $returnObject = ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method:dhcp</a> for description"];
         
