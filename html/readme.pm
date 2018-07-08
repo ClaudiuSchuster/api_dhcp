@@ -23,11 +23,11 @@ sub print {
                   </p>
                   <p>
                       Goto:
-                          <a style='margin-left:10px;' href='#dhcp'>DHCP</a>
+                          <a style='margin-left:10px;' href='#class_dhcp'>DHCP</a>
                           <span  style='margin:0 10px 0 10px;'>-</span>
-                          <a href='#mine'>MINE</a>
+                          <a href='#class_mine'>MINE</a>
                           <span  style='margin:0 10px 0 10px;'>-</span>
-                          <a href='#eth'>ETH</a>
+                          <a href='#class_eth'>ETH</a>
                   </p>
                   <h4 id='requests'>
                       Requests
@@ -127,16 +127,21 @@ sub print {
               </br>
               <hr />
               </br>
-              <h2 id='$_[0]'>".(uc $_[0])." <code class='method'>method: $_[0] || $_[0].*</code></h2>
+              <h2 id='class_$_[0]'>".(uc $_[0])." <code class='method'>method: $_[0] || $_[0].*</code></h2>
               <div class='indented'>
                 <hr />
             ";
         }
     };  
+    my $printMethodList = sub {
+        print "<ul>";
+        print "<li><a href='#$_'>$_</a></li>" for ( @{$_[0]} );
+        print "</ul>";
+    };
     my $printMethod = sub {
         my $printNewMethodTitle = sub { # 'Method', 'Description', 'Note'
             print "
-                <h3>$_[1] <code class='method'>method: $_[0]</code> </h3>
+                <h3 id='$_[0]'>$_[1] <code class='method'>method: $_[0]</code> </h3>
             ";
             print "
                 <p>
@@ -256,6 +261,12 @@ sub print {
             code.method {
               margin: 0 24px 0 24px;
             }
+            :target:before {
+                content: '';
+                display: block;
+                height: 54px; /* fixed header height*/
+                margin: -54px 0 0; /* negative fixed header height */
+            }
             h1 {
               position: fixed;
               background: -webkit-linear-gradient(top, white 60%, rgba(255,255,255,0));
@@ -349,7 +360,8 @@ sub print {
     
     $printReadmeClass->('dhcp');
     {
-
+        $printMethodList->(['dhcp','dhcp.restartservice','dhcp.addhost','dhcp.removehost','dhcp.alterhost','dhcp.addgroup','dhcp.removegroup','dhcp.altergroup']);
+        
         my $returnObject = ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method:dhcp</a> for description"];
         
         $printMethod->({
