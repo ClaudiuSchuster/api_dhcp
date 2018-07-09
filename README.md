@@ -8,7 +8,7 @@
 * Simple DHCP frontend: http://10.20.0.10:88/dhcp
 
 
-### api.service systemd definition:
+### api.service Systemd Definition:
 
     [Unit]
     Description=api.pl
