@@ -50,4 +50,4 @@
  - Net::Server::Single
  - Net::SSLeay
  - Socket6
- - and possibly others
+ - *and possibly others*
