@@ -28,7 +28,7 @@
 
 
 ### Perl Dependencies:
- - HTTP-Server-Simple-CGI-PreFork   (requires IPv6 and debian packages 'libssl-dev' & 'libz-dev')
+ - HTTP-Server-Simple-CGI-PreFork   (requires IPv6 and debian packages 'libssl-dev' & 'libz-dev' to compile)
  - Net::ISC::DHCPd
  - JSON
  - *______ below should be installed by previous automatically ______*
