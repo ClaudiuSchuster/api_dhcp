@@ -87,7 +87,7 @@ sub alter {
             return { 'rc' => 400, 'msg' => "Host 'newname' '".$params->{newname}."' already exist. Abort!" }
                 if( defined $params->{newname} && $params->{newname} =~ /$name/i );
             return { 'rc' => 400, 'msg' => "Host 'newmac' '".$params->{newmac}."' already exist. Abort!" }
-                if ( defined $params->{newmac} && $params->{newmac} =~ /$mac/i);
+                if( defined $params->{newmac} && $params->{newmac} =~ /$mac/i );
         }
     }
     $params->{group} = $movable->{group}->{name} unless( defined $params->{group} );
