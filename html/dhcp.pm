@@ -15,7 +15,7 @@ sub print {
     my $json = { meta => { rc => 200, msg => undef, method => undef, postdata => { method => 'dhcp' } }, data => {} };
     eval { $json->{meta}{postdata} = { %{$json->{meta}{postdata}}, %{decode_json($cgi->param('POSTDATA') || '{}')} }; 1; } or die 'error.decode_json: '.$@;
     my $generateDhcpdConf_sub = API::methods::dhcp::run($cgi,$json,1) || die "Error executing method! Try JSON API for detailed error.\n";
-    my $dhcpd = $json->{data}{dhcp};
+    my $dhcp = $json->{data}{dhcp};
     my $sitePath = $cgi->path_info();
     
     print $cgi->header, $cgi->start_html(
@@ -25,7 +25,7 @@ sub print {
                         a:hover {text-decoration: underline;}"}
     );
     print "<div style='padding-bottom: 4px; color: #2EFEF7;'>service isc-dhcp-server: "
-         .(${$dhcpd->{status}{active}} ? '<span style="color: lightgreen;">running</span>' : '<span style="color: red;">stopped</span>')." - since: ".$dhcpd->{status}{lstart}." (".$dhcpd->{status}{etimes}." sec ago)</div>";
+         .(${$dhcp->{status}{active}} ? '<span style="color: lightgreen;">running</span>' : '<span style="color: red;">stopped</span>')." - since: ".$dhcp->{status}{lstart}." (".$dhcp->{status}{etimes}." sec ago)</div>";
     print "<div>";
     print qq~<form><input style="margin-left: 10px; width: 220px; background-color: #A9F5A9; color: #0B2F3A; font-weight: bold; float: left; margin-right: 20px;" 
                         type="button" value="-- Reload --" onclick="window.location.href='http://$ENV{HTTP_HOST}$sitePath'" /></form> ~;
@@ -44,19 +44,19 @@ sub print {
                 <input style="width: 220px; background-color: #F78181; color: #0B2F3A; font-weight: bold; float: left;" type="submit" value="! Restart ISC-DHCP-SERVER !"  />
              </form> ~;
     print "</div><br/><br/>";
-    for my $groupName (sort keys %{$dhcpd->{groups}}) {
-        if ( $groupName =~ /winbios|.*-dev/ && keys %{$dhcpd->{groups}{$groupName}{hosts}} > 0 && ( !grep{$_ =~ /pxe.test.*/i} keys %{$dhcpd->{groups}{$groupName}{hosts}} or keys %{$dhcpd->{groups}{$groupName}{hosts}} > 1 ) ) {
+    for my $groupName (sort keys %{$dhcp->{groups}}) {
+        if ( $groupName =~ /winbios|.*-dev/ && keys %{$dhcp->{groups}{$groupName}{hosts}} > 0 && ( !grep{$_ =~ /pxe.test.*/i} keys %{$dhcp->{groups}{$groupName}{hosts}} or keys %{$dhcp->{groups}{$groupName}{hosts}} > 1 ) ) {
             print "<span style='margin-left: 10px; font-weight: bold; color: #FA58F4;'>[ $groupName ]</span><br/>";
         } else {
             print "<span style='margin-left: 10px; font-weight: bold;'>[ $groupName ]</span><br/>";
         }
-        for my $hostName (sort keys %{$dhcpd->{groups}{$groupName}{hosts}}) {
+        for my $hostName (sort keys %{$dhcp->{groups}{$groupName}{hosts}}) {
             print "<div style='margin-left: 50px; overflow: hidden;".
                 ($hostName =~ /pxe.test.*/i ? "font-weight: bold; color: cyan;" : "")
                 ."'><span style='float:left;'>".$hostName."</span>"
-                ." <span style='margin-left: 5px; float:left; font-size: 11px;'>(".$dhcpd->{groups}{$groupName}{hosts}{$hostName}{hardware_address}.")</span>";
+                ." <span style='margin-left: 5px; float:left; font-size: 11px;'>(".$dhcp->{groups}{$groupName}{hosts}{$hostName}{hardware_address}.")</span>";
             if($hostName =~ /pxe.test.*/i) {
-                    for my $inGroupName (sort keys %{$dhcpd->{groups}}) {
+                    for my $inGroupName (sort keys %{$dhcp->{groups}}) {
                         print qq~
                         <span style='float:left; margin-left: 5px; overflow: hidden;'>
                         <form method="post" enctype='text/plain' id="move_$hostName$inGroupName">
@@ -97,8 +97,8 @@ sub print {
                 print qq~
                 <span style='float:left; margin-left: 5px; overflow: hidden;'>
                 <form method="post" enctype='text/plain' id="move_vivso_$hostName">
-                    <input type="hidden" name='{"method":"dhcp.host.alter","params":{"group":"$dhcpd->{groups}{$groupName}{hosts}{$hostName}{vivso}","name":"$hostName"}, "htmlFormTrash":"' value='"}'>
-                    <a style="color: #FA58F4;" href="javascript:{}" onclick="document.getElementById('move_vivso_$hostName').submit(); return false;">&raquo; $dhcpd->{groups}{$groupName}{hosts}{$hostName}{vivso}</a>
+                    <input type="hidden" name='{"method":"dhcp.host.alter","params":{"group":"$dhcp->{groups}{$groupName}{hosts}{$hostName}{vivso}","name":"$hostName"}, "htmlFormTrash":"' value='"}'>
+                    <a style="color: #FA58F4;" href="javascript:{}" onclick="document.getElementById('move_vivso_$hostName').submit(); return false;">&raquo; $dhcp->{groups}{$groupName}{hosts}{$hostName}{vivso}</a>
                 </form></span>
                 ~;
             }
