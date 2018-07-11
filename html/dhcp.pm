@@ -12,20 +12,11 @@ sub print {
     my $cgi = shift;
     
     ### Initialize JSON structure and execute API::methods::dhcp::run
-    my $json = {
-        meta => {
-            rc => 200,
-            msg => undef,
-            method => undef,
-            postdata => undef
-        },
-        data => {}
-    };
+    my $json = { meta => { rc => 200, msg => undef, method => undef }, data => {} };
     eval { $json->{meta}{postdata} = decode_json( $cgi->param('POSTDATA') || "{}" ); 1; } or die 'error.decode_json: '.$@;
-    my $method_dhcp = API::methods::dhcp::run($cgi,$json) || die "Error executing method! Try JSON API for detailed error.\n";
-        
-    my $dhcpd = $method_dhcp->{data};
-    my $generateDhcpdConf_sub = $method_dhcp->{generateDhcpdConf_sub};
+    $json->{meta}{'postdata'}{'method'} = 'dhcp' unless( $json->{meta}{postdata}{method} );
+    my $generateDhcpdConf_sub = API::methods::dhcp::run($cgi,$json,1) || die "Error executing method! Try JSON API for detailed error.\n";
+    my $dhcpd = $json->{data}{dhcp};
     my $sitePath = $cgi->path_info();
     
     print $cgi->header, $cgi->start_html(

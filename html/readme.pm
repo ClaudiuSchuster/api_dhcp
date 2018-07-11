@@ -17,7 +17,7 @@ sub print {
             returnObject => ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method:dhcp</a> for description"]
         },
         {
-            method          => "dhcp",
+            method          => "dhcp || dhcp.get",
             title           => "Get DHCP configuration data",
             note            => "The described return data will be returned with every <code>dhcp.*</code> API-Method.</br>'null' value of a return parameter corresponds to a not defined value on server.",
             parameterTable  => [],

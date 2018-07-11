@@ -31,15 +31,19 @@ sub print {
     
     ### Check if module for requested method is loaded, execute the method and fill the data{}-object
     if( $json->{meta}{postdata}{method} ) {
-        my ($method) = grep { $json->{meta}{postdata}{method} =~ /^($_|$_(\.\w+)*)$/ }  map /methods\/(\w+)\.pm/, keys %INC;
+        my ($method) = grep { $json->{meta}{postdata}{method} =~ /^($_)(?:\..*)?$/ }  map /methods\/(\w+)\.pm/, keys %INC;
         if( defined $method ) {
             {
                 no strict 'refs';
                 my $method_run_ref = \&{"API::methods::${method}::run"};
                 my $method_run_result = $method_run_ref->($cgi,$json);
-                $json->{'data'}{$method} = $method_run_result->{data};
+                $json->{meta} = { %{$json->{meta}}, %$method_run_result } if( ref($method_run_result) eq 'HASH' );
             }
             $json->{'data'}{$method} = {} if( $json->{meta}{postdata}{nodata} );
+        } else {
+            my ($reqPackage) = ( $json->{meta}{postdata}{method} =~ /^(\w+)(?:\..*)?/ );
+            $json->{meta}{rc}  = 400;
+            $json->{meta}{msg} = "Requested method class '".($reqPackage || '')."' (class.subclass.function) does not exist. Abort!";
         }
     }
     
