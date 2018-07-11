@@ -55,6 +55,8 @@ sub run {
             print OUT "$line\n";
         }
         close (OUT);
+        
+        return undef;
     };
     ### sub: Create %dhcpd hash with all infos from DHCPD
     my $create_dhcp_hash = sub {
@@ -131,7 +133,7 @@ sub run {
                     $json->{meta}{postdata}{params} || undef
                 );
                 $create_dhcp_hash->($json,$config,$leases);
-                $write_dhcpd_conf->() unless($method_run_result);
+                $method_run_result = $write_dhcpd_conf->() unless($method_run_result);
                 return $method_run_result
                     unless( $isHtml );
             }
