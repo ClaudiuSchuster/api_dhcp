@@ -18,17 +18,17 @@ sub run {
     my $isHtml = shift;
     
     ### Initialize dhcp paths...
-    my $dhcpdPath = '/usr/sbin/dhcpd';
-    my $filename = '/etc/dhcp/dhcpd.conf';
-    my $leasefile = '/var/lib/dhcp/dhcpd.leases';
+    my $path_dhcpd_bin    = '/usr/sbin/dhcpd';
+    my $path_dhcpd_conf   = '/etc/dhcp/dhcpd.conf';
+    my $path_dhcpd_leases = '/var/lib/dhcp/dhcpd.leases';
     
     ### Parsing dhcpd.conf and leases
     my ($config, $leases);
     eval {
-        $config = Net::ISC::DHCPd::Config->new( file => $filename );
+        $config = Net::ISC::DHCPd::Config->new( file => $path_dhcpd_conf );
         $config->parse; # parse the config
         for my $include ($config->includes) { $include->parse; } # parsing includes are lazy
-        $leases = Net::ISC::DHCPd::Leases->new( file => $leasefile );
+        $leases = Net::ISC::DHCPd::Leases->new( file => $path_dhcpd_leases );
         $leases->parse; # parse the leases file
         1; 
     } or do {
@@ -45,8 +45,8 @@ sub run {
     };
     ### sub: write dhcp config to disk
     my $write_dhcpd_conf = sub {
-        open (OUT, "> $filename") or do {
-            return { 'rc' => 500, 'msg' => "error.write_dhcpd_conf: Could not open output file for write '$filename'!: ".$@ };
+        open (OUT, "> $path_dhcpd_conf") or do {
+            return { 'rc' => 500, 'msg' => "error.write_dhcpd_conf: Could not open output file for write '$path_dhcpd_conf'!: ".$@ };
         };
         my @contents = split '\n', $generate_config->();
         foreach my $line (@contents) {
@@ -58,7 +58,7 @@ sub run {
     };
     ### sub: Create %dhcpd hash with all infos from DHCPD
     my $create_dhcp_hash = sub {
-        my $pid = API::helpers::trim(`pidof $dhcpdPath`) || 0;
+        my $pid = API::helpers::trim(`pidof $path_dhcpd_bin`) || 0;
         $json->{data}{dhcp}{status} = {
             active => $pid ? \1 : \0,
             lstart => $pid ? API::helpers::trim(`ps -o lstart= -p $pid`) : undef,
