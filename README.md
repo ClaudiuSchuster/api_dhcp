@@ -8,7 +8,7 @@
 * Simple DHCP frontend: http://10.20.0.10:88/dhcp
 
 
-### api.service systemd definition:
+### api.service Systemd Definition:
 
     [Unit]
     Description=api.pl
@@ -27,6 +27,27 @@
     WantedBy=multi-user.target
 
 
-### Perl DEPENDENCIES:
- - HTTP-Server-Simple-CGI-PreFork   (requires IPv6 and debian packages 'libssl-dev' & 'libz-dev')
+### Perl Dependencies:
+ - HTTP-Server-Simple-CGI-PreFork   (requires IPv6 and debian packages 'libssl-dev' & 'libz-dev' to compile)
+ - Net::ISC::DHCPd
  - JSON
+ - *______ below should be installed by previous automatically ______*
+ - Class::Load
+ - File::Temp
+ - IO::Pty
+ - Moose
+ - MooseX::Types
+ - MooseX::Types::Path::Class
+ - NetAddr::IP
+ - Path::Class
+ - Time::HiRes
+ - Time::Local
+ - HTTP::Server::Simple
+ - IO::Socket::INET6
+ - Net::Server
+ - Net::Server::PreFork
+ - Net::Server::Proto::SSLEAY
+ - Net::Server::Single
+ - Net::SSLeay
+ - Socket6
+ - *. . . and possibly others . . .*
