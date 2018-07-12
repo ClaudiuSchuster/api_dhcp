@@ -14,7 +14,7 @@ sub print {
     API::html::readme::print::ReadmeClass([
         {
             readmeClass  => 'dhcp',
-            returnObject => ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp'>method:dhcp</a> for description"]
+            returnObject => ['data:dhcp', 'object{}', 'yes', "Contains the DHCP configuration, view <a href='#dhcp || dhcp.get'>method:dhcp</a> for description"]
         },
         {
             method          => "dhcp || dhcp.get",
@@ -88,7 +88,7 @@ curl http://$ENV{HTTP_HOST} -d '{"nodata":1,"method":"dhcp.service.restart"}'
    },
    "data" : {
       "dhcp" : {}  /* Contains (without nodata=1) the isc-dhcp-server service status, uptime and configuration.
-   }                  View <a href='#dhcp'>method:dhcp</a> for detailed description. */
+   }                  View <a href='#dhcp || dhcp.get'>method:dhcp</a> for detailed description. */
 }
             ~,
             returnDataTable => [ 'returnObject' ],
