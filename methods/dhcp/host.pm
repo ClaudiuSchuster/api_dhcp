@@ -27,7 +27,7 @@ sub add {
     return { 'rc' => 500, 'msg' => "Failure during addhost name: '".$params->{name}."' mac: '".$params->{mac}."' in group: '".$params->{group}."'!" }
         unless( $group[0]->add_host({ name => $params->{name}, hardwareethernet => [{ value => $params->{mac} }] }) );
 
-    return undef;
+    return { 'rc' => 200 };
 }
 
 sub remove {
@@ -55,7 +55,7 @@ sub remove {
     return { 'rc' => 500, 'msg' => "Failure during removal of host '".$removable->{name}."' in group '".$removable->{group}."' for removal!" }
         unless( $removable->{group}->remove_hosts($removable->{host}) );
 
-    return undef;
+    return { 'rc' => 200 };
 }
 
 sub alter {
@@ -115,7 +115,7 @@ sub alter {
             );
     }
 
-    return undef;
+    return { 'rc' => 200 };
 }
 
 

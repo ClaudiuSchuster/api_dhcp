@@ -10,7 +10,7 @@ sub restart {
     return { 'rc' => 500, 'msg' => "error.dhcp.service.restart: ".$result }
         if( defined $result && $result ne "" );
 
-    return undef;
+    return { 'rc' => 200 };
 }
 
 

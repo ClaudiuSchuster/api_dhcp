@@ -15,15 +15,7 @@ sub print {
     my $cgi = shift;
     
     ### Initialize JSON structure
-    my $json = {
-        meta => {
-            rc => 200,
-            msg => undef,
-            method => undef,
-            postdata => undef
-        },
-        data => {}
-    };
+    my $json = { meta => { rc => undef, msg => undef, method => undef, postdata => undef }, data => {} };
     eval { $json->{meta}{postdata} = decode_json( $cgi->param('POSTDATA') || "{}" ); 1; } or do { 
         $json->{meta}{rc}  = 400;
         $json->{meta}{msg} = 'error.decode_json: '.$@;
@@ -45,6 +37,9 @@ sub print {
             $json->{meta}{rc}  = 400;
             $json->{meta}{msg} = "Requested method class '".($reqPackage || '')."' (class.subclass.function) does not exist. Abort!";
         }
+    } else {
+        $json->{meta}{rc}  = 400;
+        $json->{meta}{msg} = "No 'method' parameter transfered! 'POSTDATA' must be a JSON-Object{} like {'method':'class.subclass.function','params':{}}";
     }
     
     ### Print JSON object

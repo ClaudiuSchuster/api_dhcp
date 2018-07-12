@@ -142,7 +142,7 @@ sub run {
         }
     } elsif ( !$reqSubclass || $reqSubclass eq '' || $reqSubclass eq 'get' ) {
         $create_dhcp_hash->($json,$config,$leases);
-        return { 'method' => defined $reqSubclass && $reqSubclass eq 'get' ? $reqPackage.'.'.$reqSubclass : $reqPackage }
+        return {'rc'=>200, 'method' => defined $reqSubclass && $reqSubclass eq 'get' ? $reqPackage.'.'.$reqSubclass : $reqPackage }
             unless( $isHtml );
     } else {
             return {'rc'=>400,'msg'=>"Requested subclass '".($reqSubclass || '')."' does not exist in class '$reqPackage' (class.subclass.function). Abort!"};

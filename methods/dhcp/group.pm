@@ -26,7 +26,7 @@ sub add {
             })
         );
 
-    return undef;
+    return { 'rc' => 200 };
 }
 
 sub remove {
@@ -45,7 +45,7 @@ sub remove {
     return { 'rc' => 500, 'msg' => "Failure during removal of group '".$group[0]->{name}."'!" }
         unless( $config->remove_groups($group[0]) );
 
-    return undef;
+    return { 'rc' => 200 };
 }
 
 sub alter {
@@ -106,7 +106,7 @@ sub alter {
             unless( $optionscount == $processedOptions );
     }
 
-    return undef;
+    return { 'rc' => 200 };
 }
 
 
