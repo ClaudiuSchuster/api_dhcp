@@ -133,7 +133,7 @@ sub run {
                     $json->{meta}{postdata}{params} || undef
                 );
                 $create_dhcp_hash->($json,$config,$leases);
-                $method_run_result = $write_dhcpd_conf->() unless($method_run_result);
+                $method_run_result = $write_dhcpd_conf->() if(defined $method_run_result && $method_run_result->{rc} == 200);
                 return $method_run_result
                     unless( $isHtml );
             }
