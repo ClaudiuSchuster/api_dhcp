@@ -16,9 +16,9 @@ sub add {
             my $mac = $host->_children->[0]->{value};
             my $name = $host->{name};
             return { 'rc' => 400, 'msg' => "Host name '".$params->{name}."' already exist. Abort!" }
-                if( $params->{name} =~ /$name/i );
+                if( $params->{name} =~ /^$name$/i );
             return { 'rc' => 400, 'msg' => "Host hardware_address '".$params->{mac}."' already exist. Abort!" }
-                if ( $params->{mac} =~ /$mac/i);
+                if ( $params->{mac} =~ /^$mac$/i);
         }
     }
     my @group = $config->find_groups({ name => $params->{group} });
