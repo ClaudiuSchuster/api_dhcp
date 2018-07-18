@@ -43,7 +43,7 @@ sub remove {
         for my $host ( @{$group->hosts} ) {
             my $mac = $host->_children->[0]->{value};
             my $name = $host->{name};
-            if( (defined $params->{name} && $params->{name} =~ /$name/i) || (defined $params->{mac} && $params->{mac} =~ /$mac/i) ) {
+            if( (defined $params->{name} && $params->{name} =~ /^$name$/i) || (defined $params->{mac} && $params->{mac} =~ /^$mac$/i) ) {
                 $removable = { host => $host, group => $group, found => 1 };
                 last;
             }
@@ -71,7 +71,7 @@ sub alter {
         for my $host ( @{$group->hosts} ) {
             my $mac = $host->_children->[0]->{value};
             my $name = $host->{name};
-            if( (defined $params->{name} && $params->{name} =~ /$name/i) || (defined $params->{mac} && $params->{mac} =~ /$mac/i) ) {
+            if( (defined $params->{name} && $params->{name} =~ /^$name$/i) || (defined $params->{mac} && $params->{mac} =~ /^$mac$/i) ) {
                 $movable = { host => $host, group => $group };
                 last;
             }
@@ -85,9 +85,9 @@ sub alter {
             my $mac = $host->_children->[0]->{value};
             my $name = $host->{name};
             return { 'rc' => 400, 'msg' => "Host 'newname' '".$params->{newname}."' already exist. Abort!" }
-                if( defined $params->{newname} && $params->{newname} =~ /$name/i );
+                if( defined $params->{newname} && $params->{newname} =~ /^$name$/i );
             return { 'rc' => 400, 'msg' => "Host 'newmac' '".$params->{newmac}."' already exist. Abort!" }
-                if( defined $params->{newmac} && $params->{newmac} =~ /$mac/i );
+                if( defined $params->{newmac} && $params->{newmac} =~ /^$mac$/i );
         }
     }
     $params->{group} = $movable->{group}->{name} unless( defined $params->{group} );
