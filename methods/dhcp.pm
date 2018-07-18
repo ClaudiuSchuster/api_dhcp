@@ -45,6 +45,8 @@ sub run {
     };
     ### sub: write dhcp config to disk
     my $write_dhcpd_conf = sub {
+        my $result = shift;
+        
         open (OUT, "> $path_dhcpd_conf") or do {
             return { 'rc' => 500, 'msg' => "error.write_dhcpd_conf: Could not open output file for write '$path_dhcpd_conf'!: ".$@ };
         };
@@ -56,7 +58,7 @@ sub run {
         }
         close (OUT);
         
-        return undef;
+        return $result;
     };
     ### sub: Create %dhcpd hash with all infos from DHCPD
     my $create_dhcp_hash = sub {
@@ -133,7 +135,7 @@ sub run {
                     $json->{meta}{postdata}{params} || undef
                 );
                 $create_dhcp_hash->($json,$config,$leases);
-                $method_run_result = $write_dhcpd_conf->() if(defined $method_run_result && $method_run_result->{rc} == 200);
+                $method_run_result = $write_dhcpd_conf->($method_run_result) if(defined $method_run_result && $method_run_result->{rc} == 200);
                 return $method_run_result
                     unless( $isHtml );
             }
