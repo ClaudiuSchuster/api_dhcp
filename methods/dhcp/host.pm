@@ -25,7 +25,11 @@ sub add {
     return { 'rc' => 400, 'msg' => "Target group '".$params->{group}."' not found. Abort!" }
         unless( scalar @group );
     return { 'rc' => 500, 'msg' => "Failure during addhost name: '".$params->{name}."' mac: '".$params->{mac}."' in group: '".$params->{group}."'!" }
-        unless( $group[0]->add_host({ name => $params->{name}, hardwareethernet => [{ value => $params->{mac} }] }) );
+        unless( $group[0]->add_host({
+			name => $params->{name},
+			hardwareethernet => [{ value => $params->{mac} }],
+			keyvalues => [{ name => 'ddns-hostname', value => $params->{name}, quoted => 1}]
+		}) );
 
     return { 'rc' => 200 };
 }
@@ -102,7 +106,8 @@ sub alter {
                 $newGroup[0]->add_host({
                     name => defined $params->{newname} ? $params->{newname} : $movable->{host}->{name},
                     hardwareethernet =>  defined $params->{newmac} ? [{ value => $params->{newmac} }] : [{ value => $movable->{host}->_children->[0]->{value} }],
-                    options => [{ name => "vivso", value => $movable->{group}->{name}, quoted => 1 }]
+                    options => [{ name => "vivso", value => $movable->{group}->{name}, quoted => 1 }],
+					keyvalues => [{ name => 'ddns-hostname', value => defined $params->{newname} ? $params->{newname} : $movable->{host}->{name}, quoted => 1}]
                 })
             );
     } else {
@@ -110,7 +115,8 @@ sub alter {
             unless(
                 $newGroup[0]->add_host({
                     name => defined $params->{newname} ? $params->{newname} : $movable->{host}->{name},
-                    hardwareethernet => defined $params->{newmac} ? [{ value => $params->{newmac} }] : [{ value => $movable->{host}->_children->[0]->{value} }]
+                    hardwareethernet => defined $params->{newmac} ? [{ value => $params->{newmac} }] : [{ value => $movable->{host}->_children->[0]->{value} }],
+					keyvalues => [{ name => 'ddns-hostname', value => defined $params->{newname} ? $params->{newname} : $movable->{host}->{name}, quoted => 1}]
                 })
             );
     }
