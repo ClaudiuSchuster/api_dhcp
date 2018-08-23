@@ -124,7 +124,7 @@ curl http://$ENV{HTTP_HOST} -d '{"method":"dhcp.host.remove","params":{"mac":"11
         {
             method          => "dhcp.host.alter",
             title           => "Alter a host (<code>Change</code> group <code>and/or</code> name <code>and/or</code> mac-address)",
-            note            => "If the host will be moved to a group with name <code>(.*-dev|winbios)</code> the host-parameter <code>'vivso'</code> will be set with the origin-group-name to move the host easy back to its original-group.",
+            note            => "Altering of MAC-Address may require further manual Bind DNS-Zone reconfiguration! </br>If the host will be moved to a group with name <code>(.*-dev|winbios)</code> the host-parameter <code>'vivso'</code> will be set with the origin-group-name to move the host easy back to its original-group.",
             parameterTable  => [
                 ['params:name', 'string', 'or mac', '', "'name' of the host"],
                 ['params:mac', 'string', 'or name', '', "'mac'-address of the host"],
