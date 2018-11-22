@@ -8,7 +8,7 @@ use html::readme::print;
 sub print { 
     my $cgi = shift;
     
-    API::html::readme::print::ReadmeClass('introduction',$cgi,' - pxe.mine.io',[]);  # ['dhcp','mine','eth']
+    API::html::readme::print::ReadmeClass('introduction',$cgi,' - api_isc-dhcp',[]);  # ['dhcp','mine','eth']
     
     
     API::html::readme::print::ReadmeClass([

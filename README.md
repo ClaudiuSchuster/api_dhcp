@@ -1,11 +1,10 @@
-## api_pxe.mine.io ( API on: pxe.mine.io:88 / 10.20.0.10:88 )
+## api_isc-dhcp
 
 ### Service URLs
 
-
-* API: http://10.20.0.10:88/
-* API-Documentation: http://10.20.0.10:88/readme
-* Simple DHCP frontend: http://10.20.0.10:88/dhcp
+* API: http://IP:88/
+* API-Documentation: http://IP:88/readme
+* Simple DHCP frontend: http://IP:88/dhcp
 
 
 ### api.service Systemd Definition:
@@ -15,9 +14,9 @@
     After=syslog.target network.target remote-fs.target nss-lookup.target
      
     [Service]
-    WorkingDirectory=/pxe/api
+    WorkingDirectory=/api_isc-dhcp
      
-    ExecStart=/bin/sh -c "/pxe/api/api.pl 88 >> /pxe/api/log.log 2>&1"
+    ExecStart=/bin/sh -c "/api_isc-dhcp/api.pl 88 >> /api_isc-dhcp.log 2>&1"
      
     Type=simple
     Restart=on-failure

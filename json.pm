@@ -6,8 +6,6 @@ use JSON;
 
 ### Load our api-method modules. Note: Modules must have a run() function!
 use methods::dhcp;
-use methods::eth;
-use methods::mine;
 
 
 ### Create and print the JSON Object
